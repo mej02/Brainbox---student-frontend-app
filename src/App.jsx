@@ -123,33 +123,33 @@ export const AppProvider = ({ children }) => {
 
   // --- Auth Functions ---
   const login = async (username, password, role) => {
-  setLoading(true);
-  try {
-    // Always fetch CSRF token before login
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-
-    const response = await fetch(`${API_BASE_URL}/login/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify({ username, password, role }),
-      credentials: "include",
-    });
+    setLoading(true);
+    try {
+      // Always fetch CSRF first
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+      const csrftoken = getCookie("csrftoken");
+      if (!csrftoken) {
+        showMessage("error", "CSRF token not set. Please refresh and try again.");
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify({ username, password, role }),
+        credentials: "include",
+      });
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-
-      // Save login data
       setUserRole(data.role);
       if (data.role === "student") {
         setLoggedInStudentId(data.student_id);
       }
-
       showMessage("success", "Login successful!");
       return true;
     } catch (error) {
@@ -164,15 +164,18 @@ export const AppProvider = ({ children }) => {
   const register = async (username, password, role, studentId = null) => {
     setLoading(true);
     try {
-      // Always fetch CSRF token before registration
       await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
       const csrftoken = getCookie("csrftoken");
-
+      if (!csrftoken) {
+        showMessage("error", "CSRF token not set. Please refresh and try again.");
+        setLoading(false);
+        return false;
+      }
       const payload = { username, password, role };
       if (role === "student") {
         payload.student_id = studentId;
+        // Include student_id for student registration
       }
-
       const response = await fetch(`${API_BASE_URL}/register/`, {
         method: "POST",
         headers: {
@@ -180,10 +183,8 @@ export const AppProvider = ({ children }) => {
           "X-CSRFToken": csrftoken,
         },
         body: JSON.stringify(payload),
-        credentials: "include",
       });
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || "Registration failed");
       }
@@ -199,7 +200,21 @@ export const AppProvider = ({ children }) => {
 
   // Handles user logout.
   // Uses useCallback to memoize the function, preventing unnecessary re-renders.
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      // Call backend logout endpoint to clear session and CSRF cookie
+      await fetch(`${API_BASE_URL}/logout/`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // Fetch new CSRF token to reset session
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+    } catch (e) {
+      // Ignore errors, just clear state
+    }
     setUserRole(null); // Clear user role
     setLoggedInStudentId(null); // Clear logged-in student ID
     showMessage("success", "Logged out successfully!"); // Show success notification
@@ -241,24 +256,30 @@ export const AppProvider = ({ children }) => {
 
   // Adds a new student record.
   const addStudent = async (studentData) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const formData = new FormData();
-    for (const key in studentData) {
-      if (studentData[key] !== null && studentData[key] !== undefined) {
-        formData.append(key, studentData[key]);
+    setLoading(true);
+    try {
+      // Always fetch CSRF first
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+      const formData = new FormData();
+      for (const key in studentData) {
+        if (studentData[key] !== null && studentData[key] !== undefined) {
+          formData.append(key, studentData[key]);
+        }
       }
-    }
-    const response = await fetch(`${API_BASE_URL}/students/`, {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
-    });
+      const csrftoken = getCookie("csrftoken");
+      if (!csrftoken) {
+        showMessage("error", "CSRF token not set. Please refresh and try again.");
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/students/`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrftoken, // <--- ADD CSRF TOKEN TO HEADERS
+        },
+      });
       console.log("Add Student Response Status:", response.status);
       if (!response.ok) {
         const errorData = await response.json();
@@ -279,36 +300,38 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Updates an existing student record.
- const updateStudent = async (student_id, studentData, isFormData = false) => {
-  setLoading(true);
-  try {
-    // Always fetch CSRF token before modifying requests
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/students/${student_id}/`, {
-      method: "PATCH",
-      body: studentData,
-      credentials: "include",
-      headers: isFormData
-        ? { "X-CSRFToken": csrftoken }
-        : { "Content-Type": "application/json", "X-CSRFToken": csrftoken },
-    });
+  const updateStudent = async (student_id, studentData, isFormData = false) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/students/${student_id}/`, {
+        method: 'PATCH',
+        body: isFormData ? studentData : JSON.stringify(studentData),
+        credentials: 'include',
+        headers: isFormData
+          ? { 'X-CSRFToken': csrftoken }
+          : { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      });
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Update error:", errorData);
         throw new Error(
           errorData.student_id?.[0] ||
             errorData.email?.[0] ||
             errorData.message ||
-            "Failed to update student"
+            'Failed to update student'
         );
       }
-      showMessage("success", "Student updated successfully!");
-      fetchStudents(); // Refresh the list after updating
+      showMessage('success', 'Student updated successfully!');
+      fetchStudents();
       return true;
     } catch (error) {
-      showMessage("error", `Failed to update student: ${error.message}`);
+      showMessage('error', `Failed to update student: ${error.message}`);
       return false;
     } finally {
       setLoading(false);
@@ -316,18 +339,23 @@ export const AppProvider = ({ children }) => {
   };
 
   // Deletes a student record.
-const deleteStudent = async (student_id) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/students/${student_id}/`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
-    });
+  const deleteStudent = async (student_id) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/students/${student_id}/`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrftoken,
+        },
+      });
       if (!response.ok) throw new Error("Failed to delete student");
       showMessage("success", "Student deleted successfully!");
       fetchStudents(); // Refresh the list after deleting
@@ -363,96 +391,111 @@ const deleteStudent = async (student_id) => {
     }
   }, [showMessage]);
 
-const addSubject = useCallback(
-  async (newSubject) => {
+  // Adds a new subject record.
+  const addSubject = useCallback(
+    async (newSubject) => {
+      setLoading(true);
+      try {
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+        const csrftoken = getCookie('csrftoken');
+        if (!csrftoken) {
+          showMessage('error', 'CSRF token not set. Please refresh and try again.');
+          setLoading(false);
+          return false;
+        }
+        const response = await fetch(`${API_BASE_URL}/subjects/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+          },
+          credentials: 'include',
+          body: JSON.stringify(newSubject),
+        });
+        if (!response.ok) throw new Error('Failed to add subject');
+        const addedSubject = await response.json();
+        setSubjects((prev) => [...prev, addedSubject]);
+        showMessage('success', 'Subject successfully added');
+        return true;
+      } catch (error) {
+        showMessage('error', error.message);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showMessage]
+  );
+
+  // Updates an existing subject record.
+  const updateSubject = async (code, subjectData) => {
     setLoading(true);
     try {
-      // Always fetch CSRF token before modifying requests
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-      const csrftoken = getCookie("csrftoken");
-      const response = await fetch(`${API_BASE_URL}/subjects/`, {
-        method: "POST",
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/subjects/${code}/`, {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
         },
-        credentials: "include",
-        body: JSON.stringify(newSubject),
+        body: JSON.stringify(subjectData),
+        credentials: 'include',
       });
-      if (!response.ok) throw new Error("Failed to add subject");
-      const addedSubject = await response.json();
-      setSubjects((prev) => [...prev, addedSubject]);
-      showMessage("success", "Subject successfully added");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.code?.[0] ||
+          errorData.name?.[0] ||
+          errorData.message ||
+          'Failed to update subject'
+        );
+      }
+      showMessage('success', 'Subject updated successfully!');
+      fetchSubjects(); // Refresh the list
       return true;
     } catch (error) {
-      showMessage("error", error.message);
+      showMessage('error', `Failed to update subject: ${error.message}`);
       return false;
     } finally {
       setLoading(false);
     }
-  },
-  [showMessage]
-);
+  };
 
-  // Update Subject
-const updateSubject = async (code, subjectData) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/subjects/${code}/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify(subjectData),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.code?.[0] ||
-          errorData.name?.[0] ||
-          errorData.message ||
-          "Failed to update subject"
-      );
+  // Deletes a subject record.
+  const deleteSubject = async (code) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/subjects/${code}/`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'X-CSRFToken': csrftoken,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to delete subject');
+      showMessage('success', 'Subject deleted successfully!');
+      fetchSubjects(); // Refresh the list
+      return true;
+    } catch (error) {
+      showMessage('error', `Failed to delete subject: ${error.message}`);
+      return false;
+    } finally {
+      setLoading(false);
     }
-    showMessage("success", "Subject updated successfully!");
-    fetchSubjects(); // Refresh the list
-    return true;
-  } catch (error) {
-    showMessage("error", `Failed to update subject: ${error.message}`);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
-
-  // Delete Subject
-const deleteSubject = async (code) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/subjects/${code}/`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
-    });
-    if (!response.ok) throw new Error("Failed to delete subject");
-    showMessage("success", "Subject deleted successfully!");
-    fetchSubjects(); // Refresh the list
-    return true;
-  } catch (error) {
-    showMessage("error", `Failed to delete subject: ${error.message}`);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // --- Grade Functions ---
   // Fetches all grade records.
@@ -473,96 +516,111 @@ const deleteSubject = async (code) => {
 
   // Adds a new grade record.
   const addGrade = async (gradeData) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/grades/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify(gradeData),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.non_field_errors?.[0] ||
-          errorData.message ||
-          "Failed to add grade"
-      );
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/grades/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify(gradeData),
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.non_field_errors?.[0] ||
+            errorData.message ||
+            "Failed to add grade"
+        );
+      }
+      showMessage("success", "Grade added successfully!");
+      fetchGrades(); // Refresh the list
+      return true;
+    } catch (error) {
+      showMessage("error", `Failed to add grade: ${error.message}`);
+      return false;
+    } finally {
+      setLoading(false);
     }
-    showMessage("success", "Grade added successfully!");
-    fetchGrades(); // Refresh the list
-    return true;
-  } catch (error) {
-    showMessage("error", `Failed to add grade: ${error.message}`);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-  // Update Grade
-const updateGrade = async (id, gradeData) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/grades/${id}/`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify(gradeData),
-      credentials: "include",
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.non_field_errors?.[0] ||
-          errorData.message ||
-          "Failed to update grade"
-      );
+  // Updates an existing grade record.
+  const updateGrade = async (id, gradeData) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/grades/${id}/`, {
+        method: 'PUT', // Use PUT for full replacement of resource
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken, // <--- ADD THIS LINE
+        },
+        body: JSON.stringify(gradeData),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.non_field_errors?.[0] ||
+            errorData.message ||
+            "Failed to update grade"
+        );
+      }
+      showMessage("success", "Grade updated successfully!");
+      fetchGrades(); // Refresh the list
+      return true;
+    } catch (error) {
+      showMessage("error", `Failed to update grade: ${error.message}`);
+      return false;
+    } finally {
+      setLoading(false);
     }
-    showMessage("success", "Grade updated successfully!");
-    fetchGrades(); // Refresh the list
-    return true;
-  } catch (error) {
-    showMessage("error", `Failed to update grade: ${error.message}`);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-  // Delete Grade
-const deleteGrade = async (id) => {
-  setLoading(true);
-  try {
-    await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-    const csrftoken = getCookie("csrftoken");
-    const response = await fetch(`${API_BASE_URL}/grades/${id}/`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "X-CSRFToken": csrftoken,
-      },
-    });
-    if (!response.ok) throw new Error("Failed to delete grade");
-    showMessage("success", "Grade deleted successfully!");
-    fetchGrades(); // Refresh the list
-    return true;
-  } catch (error) {
-    showMessage("error", `Failed to delete grade: ${error.message}`);
-    return false;
-  } finally {
-    setLoading(false);
-  }
-};
+  // Deletes a grade record.
+  const deleteGrade = async (id) => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) {
+        showMessage('error', 'CSRF token not set. Please refresh and try again.');
+        setLoading(false);
+        return false;
+      }
+      const response = await fetch(`${API_BASE_URL}/grades/${id}/`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrftoken,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to delete grade");
+      showMessage("success", "Grade deleted successfully!");
+      fetchGrades(); // Refresh the list
+      return true;
+    } catch (error) {
+      showMessage("error", `Failed to delete grade: ${error.message}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --- Helper Functions for Contexts ---
   // Memoized function to get student's full name from their ID.
@@ -638,79 +696,89 @@ const deleteGrade = async (id) => {
     }
   }, [loggedInStudentId, showMessage]);
 
-  // Enroll Subject
-const enrollSubject = useCallback(
-  async (subjectCode) => {
-    if (!loggedInStudentId) return;
-    setLoading(true);
-    try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-      const csrftoken = getCookie("csrftoken");
-      const response = await fetch(
-        `${API_BASE_URL}/students/${loggedInStudentId}/enroll/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrftoken,
-          },
-          credentials: "include",
-          body: JSON.stringify({ subject_code: subjectCode }),
+  // Enroll a student in a subject
+  const enrollSubject = useCallback(
+    async (subjectCode) => {
+      if (!loggedInStudentId) return;
+      setLoading(true);
+      try {
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+        const csrftoken = getCookie('csrftoken');
+        if (!csrftoken) {
+          showMessage('error', 'CSRF token not set. Please refresh and try again.');
+          setLoading(false);
+          return false;
         }
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to enroll subject");
+        const response = await fetch(
+          `${API_BASE_URL}/students/${loggedInStudentId}/enroll/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            credentials: 'include',
+            body: JSON.stringify({ subject_code: subjectCode }),
+          }
+        );
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to enroll subject');
+        }
+        showMessage('success', 'Enrolled in subject successfully!');
+        fetchEnrollments();
+        return true;
+      } catch (error) {
+        showMessage('error', `Failed to enroll: ${error.message}`);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      showMessage("success", "Enrolled in subject successfully!");
-      fetchEnrollments();
-      return true;
-    } catch (error) {
-      showMessage("error", `Failed to enroll: ${error.message}`);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  },
-  [loggedInStudentId, showMessage, fetchEnrollments]
-);
+    },
+    [loggedInStudentId, showMessage, fetchEnrollments]
+  );
 
- // Unenroll Subject
-const unenrollSubject = useCallback(
-  async (subjectCode) => {
-    if (!loggedInStudentId) return;
-    setLoading(true);
-    try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-      const csrftoken = getCookie("csrftoken");
-      const response = await fetch(
-        `${API_BASE_URL}/students/${loggedInStudentId}/unenroll/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrftoken,
-          },
-          credentials: "include",
-          body: JSON.stringify({ subject_code: subjectCode }),
+  // Unenroll a student from a subject
+  const unenrollSubject = useCallback(
+    async (subjectCode) => {
+      if (!loggedInStudentId) return;
+      setLoading(true);
+      try {
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
+        const csrftoken = getCookie('csrftoken');
+        if (!csrftoken) {
+          showMessage('error', 'CSRF token not set. Please refresh and try again.');
+          setLoading(false);
+          return false;
         }
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to unenroll subject");
+        const response = await fetch(
+          `${API_BASE_URL}/students/${loggedInStudentId}/unenroll/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            credentials: 'include',
+            body: JSON.stringify({ subject_code: subjectCode }),
+          }
+        );
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to unenroll subject');
+        }
+        showMessage('success', 'Unenrolled from subject successfully!');
+        fetchEnrollments();
+        return true;
+      } catch (error) {
+        showMessage('error', `Failed to unenroll: ${error.message}`);
+        return false;
+      } finally {
+        setLoading(false);
       }
-      showMessage("success", "Unenrolled from subject successfully!");
-      fetchEnrollments();
-      return true;
-    } catch (error) {
-      showMessage("error", `Failed to unenroll: ${error.message}`);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  },
-  [loggedInStudentId, showMessage, fetchEnrollments]
-);
+    },
+    [loggedInStudentId, showMessage, fetchEnrollments]
+  );
 
   const studentContextValue = {
     students,
@@ -2034,6 +2102,7 @@ const SubjectManagement = () => {
               disabled={!!editingSubject} // Disable if editing existing subject
             />
           </div>
+          <div>
           <div>
             <label
               htmlFor="name"
@@ -3432,24 +3501,24 @@ const StudentDashboard = ({ loggedInStudentId }) => {
                   const file = e.target.files[0];
                   setEditForm((f) => ({
                     ...f,
-                    image: file,
-                    image_preview: file
-                      ? URL.createObjectURL(file)
-                      : f.image_preview,
+                    image: file || null,
+                    image_preview: file ? URL.createObjectURL(file) : null,
                   }));
+                  // Clear the file input value so the same file can be re-selected if needed
+                  e.target.value = null;
                 }}
                 className="block text-sm text-gray-700"
               />
-              {editForm.image && (
+              {(editForm.image || editForm.image_preview) && (
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setEditForm((f) => ({
                       ...f,
                       image: null,
                       image_preview: null,
-                    }))
-                  }
+                    }));
+                  }}
                   className="ml-2 p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-150"
                   aria-label="Clear image"
                 >
@@ -3527,7 +3596,9 @@ const AppContent = ({ showRegister, setShowRegister }) => {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Only show header/navbar if logged in
