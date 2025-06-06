@@ -66,7 +66,7 @@ import logoWhite from "./assets/image/logo-white.png";
 const DEFAULT_STUDENT_IMAGE =
   "https://placehold.co/100x100/e0e0e0/555555?text=No+Image";
 
-const API_BASE_URL = "http://localhost:8000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
 
 const COURSES = [
   {
