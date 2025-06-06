@@ -1,0 +1,142 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Modern react-calendar styles */
+.react-calendar {
+  border: none;
+  border-radius: 1rem;
+  background: #f9fafb;
+  box-shadow: 0 2px 8px rgba(32, 64, 50, 0.08);
+  font-family: 'Inter', sans-serif;
+  padding: 1rem;
+}
+.react-calendar__navigation button {
+  color: #204032;
+  min-width: 44px;
+  background: none;
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+.react-calendar__tile {
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.react-calendar__tile--active {
+  background: #204032 !important;
+  color: #fff !important;
+}
+.react-calendar__tile--now {
+  background: #e0f2f1 !important;
+  color: #204032 !important;
+}
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: #d1fae5;
+  color: #204032;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: #e53e3e;
+}
+
+/* Hide navigation buttons and extra toolbar items */
+.rbc-toolbar button {
+  display: none;
+}
+.rbc-toolbar .rbc-btn-group:first-child {
+  display: none; /* Hide Today/Back/Next */
+}
+.rbc-toolbar .rbc-btn-group:last-child {
+  display: none; /* Hide Agenda if present */
+}
+.rbc-toolbar .rbc-btn-group:nth-child(2) button {
+  display: inline-block; /* Show only Month/Week/Day if you want */
+}
+
+/* Optional: Make calendar cells more modern */
+.rbc-month-view {
+  border-radius: 1rem;
+  border: none;
+  background: #f9fafb;
+}
+.rbc-date-cell {
+  font-weight: 500;
+}
+.rbc-off-range-bg {
+  background: #f3f4f6;
+}
+.rbc-today {
+  background: #e0f2f1 !important;
+}
+.rbc-selected {
+  background: #204032 !important;
+  color: #fff !important;
+}
+
+
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
