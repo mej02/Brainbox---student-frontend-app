@@ -126,7 +126,7 @@ export const AppProvider = ({ children }) => {
     setLoading(true);
     try {
       // Always fetch CSRF first
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: "include" });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
       const csrftoken = getCookie("csrftoken");
       if (!csrftoken) {
         showMessage("error", "CSRF token not set. Please refresh and try again.");
@@ -164,7 +164,7 @@ export const AppProvider = ({ children }) => {
   const register = async (username, password, role, studentId = null) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: "include" });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
       const csrftoken = getCookie("csrftoken");
       if (!csrftoken) {
         showMessage("error", "CSRF token not set. Please refresh and try again.");
@@ -212,8 +212,8 @@ export const AppProvider = ({ children }) => {
         },
       });
       // Fetch new CSRF token to reset session
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: "include" });
-    } catch (e) {
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+    } catch {
       // Ignore errors, just clear state
     }
     setUserRole(null); // Clear user role
@@ -247,6 +247,8 @@ export const AppProvider = ({ children }) => {
       console.log("Fetched Data:", data);
 
       setStudents(data);
+      // Debug: log fetched students and their image_url
+      console.log('Fetched students:', data.map(s => ({ id: s.student_id, image_url: s.image_url })));
     } catch (error) {
       console.error("Error in fetchStudents:", error);
       showMessage("error", `Failed to fetch students: ${error.message}`);
@@ -260,7 +262,7 @@ export const AppProvider = ({ children }) => {
     setLoading(true);
     try {
       // Always fetch CSRF first
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: "include" });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
       const formData = new FormData();
       for (const key in studentData) {
         if (studentData[key] !== null && studentData[key] !== undefined) {
@@ -304,12 +306,18 @@ export const AppProvider = ({ children }) => {
   const updateStudent = async (student_id, studentData, isFormData = false) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
         return false;
+      }
+      // Debug: log FormData keys/values if isFormData
+      if (isFormData && studentData instanceof FormData) {
+        for (let pair of studentData.entries()) {
+          console.log('FormData:', pair[0], pair[1]);
+        }
       }
       const response = await fetch(`${API_BASE_URL}/students/${student_id}/`, {
         method: 'PATCH',
@@ -321,15 +329,20 @@ export const AppProvider = ({ children }) => {
       });
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('Update Student Error Response:', errorData); // <-- Add debug log
         throw new Error(
           errorData.student_id?.[0] ||
             errorData.email?.[0] ||
+            errorData.image?.[0] ||
             errorData.message ||
             'Failed to update student'
         );
       }
       showMessage('success', 'Student updated successfully!');
-      fetchStudents();      return true;
+      fetchStudents();
+      // Debug: log updated studentData and image_url
+      console.log('Updated studentData:', studentData);
+      return true;
     } catch (error) {
       showMessage('error', `Failed to update student: ${error.message}`);
       return false;
@@ -342,7 +355,7 @@ export const AppProvider = ({ children }) => {
   const deleteStudent = async (student_id) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -396,7 +409,7 @@ export const AppProvider = ({ children }) => {
     async (newSubject) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
         const csrftoken = getCookie('csrftoken');
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -431,7 +444,7 @@ export const AppProvider = ({ children }) => {
   const updateSubject = async (code, subjectData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -465,7 +478,7 @@ export const AppProvider = ({ children }) => {
   const deleteSubject = async (code) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -511,7 +524,7 @@ export const AppProvider = ({ children }) => {
   const addGrade = async (gradeData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -542,7 +555,7 @@ export const AppProvider = ({ children }) => {
   const updateGrade = async (id, gradeData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -556,7 +569,7 @@ export const AppProvider = ({ children }) => {
           'X-CSRFToken': csrftoken,
         },
         body: JSON.stringify(gradeData),
-        credentials: "include",
+        credentials: 'include',
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -576,7 +589,7 @@ export const AppProvider = ({ children }) => {
   const deleteGrade = async (id) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
       const csrftoken = getCookie('csrftoken');
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -677,7 +690,7 @@ export const AppProvider = ({ children }) => {
     async (subjectCode) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
         const csrftoken = getCookie('csrftoken');
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -712,7 +725,7 @@ export const AppProvider = ({ children }) => {
     async (subjectCode) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/api/csrf/`, { credentials: 'include' });
+        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
         const csrftoken = getCookie('csrftoken');
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
@@ -883,11 +896,10 @@ const LoadingSpinner = () => (
 // --- Login Component ---
 // Handles user login for both teachers and students.
 const Login = ({ onLogin, onRegisterClick }) => {
-  // Access loading and showMessage from AppContext
-  const { loading } = useApp();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("teacher"); // Default to teacher
+  const { loading } = useApp(); // <-- Add this line to get loading state from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -982,12 +994,12 @@ const Login = ({ onLogin, onRegisterClick }) => {
 // --- Register Component ---
 // Handles new user registration for both teachers and students.
 const Register = ({ onRegister, onLoginClick }) => {
-  const { loading } = useApp();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("teacher");
   const [studentId, setStudentId] = useState("");
   // Only for student registration
+  const { loading } = useApp(); // <-- Add this line to get loading state from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1108,7 +1120,7 @@ const Register = ({ onRegister, onLoginClick }) => {
 const StudentsManagement = () => {
   const { students, fetchStudents, addStudent, updateStudent, deleteStudent } =
     useStudents();
-  const { loading } = useApp();
+  const { loading } = useApp(); // Restore loading for button disabled and spinner
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentFormData, setStudentFormData] = useState({
     student_id: "",
@@ -1276,8 +1288,26 @@ const StudentsManagement = () => {
     e.preventDefault();
     let success;
     if (editingStudent) {
-      // UPDATE existing student
-      success = await updateStudent(editingStudent.student_id, studentFormData);
+      // If updating and an image file is present or image was cleared, use FormData
+      if (studentFormData.image instanceof File || studentFormData.image === null) {
+        const formData = new FormData();
+        for (const key in studentFormData) {
+          if (key === "current_image_url") continue; // Don't send preview
+          if (key === "image" && studentFormData.image === null) {
+            // Explicitly clear image if removed
+            formData.append("image", "");
+          } else if (studentFormData[key] !== undefined && studentFormData[key] !== null) {
+            formData.append(key, studentFormData[key]);
+          }
+        }
+        success = await updateStudent(editingStudent.student_id, formData, true);
+      } else {
+        // No image change, send as JSON
+        const payload = { ...studentFormData };
+        delete payload.current_image_url;
+        delete payload.image; // Don't send image if not changed
+        success = await updateStudent(editingStudent.student_id, payload);
+      }
     } else {
       // ADD new student
       success = await addStudent(studentFormData);
@@ -2056,7 +2086,7 @@ const SubjectManagement = () => {
             <input
               type="text"
               id="code"
-              name="code"
+                           name="code"
               value={subjectFormData.code}
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#204032] focus:border-[#204032]"
@@ -2380,7 +2410,7 @@ const GradeManagement = () => {
       {loading ? (
         <p className="text-center text-gray-600 py-4">Loading grades...</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
