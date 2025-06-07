@@ -66,7 +66,7 @@ import logoWhite from "./assets/image/logo-white.png";
 const DEFAULT_STUDENT_IMAGE =
   "https://placehold.co/100x100/e0e0e0/555555?text=No+Image";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://brainbox-student-management-system.onrender.com";
 
 const COURSES = [
   {
@@ -112,22 +112,18 @@ export const AppProvider = ({ children }) => {
 
   // Removed unused contextValue variable
 
-  // Utility function to get CSRF token from cookies
-  const getCookie = (name) => {
-    const cookieValue = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(name + "="))
-      ?.split("=")[1];
-    return cookieValue || "";
+  // --- CSRF Helper ---
+  const fetchCsrfToken = async () => {
+    const response = await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+    const data = await response.json();
+    return data.csrftoken;
   };
 
   // --- Auth Functions ---
   const login = async (username, password, role) => {
     setLoading(true);
     try {
-      // Always fetch CSRF first
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-      const csrftoken = getCookie("csrftoken");
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage("error", "CSRF token not set. Please refresh and try again.");
         setLoading(false);
@@ -164,8 +160,7 @@ export const AppProvider = ({ children }) => {
   const register = async (username, password, role, studentId = null) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
-      const csrftoken = getCookie("csrftoken");
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage("error", "CSRF token not set. Please refresh and try again.");
         setLoading(false);
@@ -261,15 +256,13 @@ export const AppProvider = ({ children }) => {
   const addStudent = async (studentData) => {
     setLoading(true);
     try {
-      // Always fetch CSRF first
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: "include" });
+      const csrftoken = await fetchCsrfToken();
       const formData = new FormData();
       for (const key in studentData) {
         if (studentData[key] !== null && studentData[key] !== undefined) {
           formData.append(key, studentData[key]);
         }
       }
-      const csrftoken = getCookie("csrftoken");
       if (!csrftoken) {
         showMessage("error", "CSRF token not set. Please refresh and try again.");
         setLoading(false);
@@ -306,8 +299,7 @@ export const AppProvider = ({ children }) => {
   const updateStudent = async (student_id, studentData, isFormData = false) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -355,8 +347,7 @@ export const AppProvider = ({ children }) => {
   const deleteStudent = async (student_id) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -409,8 +400,7 @@ export const AppProvider = ({ children }) => {
     async (newSubject) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-        const csrftoken = getCookie('csrftoken');
+        const csrftoken = await fetchCsrfToken();
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
           setLoading(false);
@@ -444,8 +434,7 @@ export const AppProvider = ({ children }) => {
   const updateSubject = async (code, subjectData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -465,7 +454,8 @@ export const AppProvider = ({ children }) => {
         throw new Error(errorData.message || 'Failed to update subject');
       }
       showMessage('success', 'Subject updated successfully!');
-      fetchSubjects();      return true;
+      fetchSubjects();
+      return true;
     } catch (error) {
       showMessage('error', `Failed to update subject: ${error.message}`);
       return false;
@@ -478,8 +468,7 @@ export const AppProvider = ({ children }) => {
   const deleteSubject = async (code) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -494,7 +483,8 @@ export const AppProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error('Failed to delete subject');
       showMessage('success', 'Subject deleted successfully!');
-      fetchSubjects();      return true;
+      fetchSubjects();
+      return true;
     } catch (error) {
       showMessage('error', `Failed to delete subject: ${error.message}`);
       return false;
@@ -524,8 +514,7 @@ export const AppProvider = ({ children }) => {
   const addGrade = async (gradeData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -542,7 +531,8 @@ export const AppProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error('Failed to add grade');
       showMessage("success", "Grade added successfully!");
-      fetchGrades();      return true;
+      fetchGrades();
+      return true;
     } catch (error) {
       showMessage("error", `Failed to add grade: ${error.message}`);
       return false;
@@ -555,8 +545,7 @@ export const AppProvider = ({ children }) => {
   const updateGrade = async (id, gradeData) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -576,7 +565,8 @@ export const AppProvider = ({ children }) => {
         throw new Error(errorData.message || 'Failed to update grade');
       }
       showMessage('success', 'Grade updated successfully!');
-      fetchGrades();      return true;
+      fetchGrades();
+      return true;
     } catch (error) {
       showMessage('error', `Failed to update grade: ${error.message}`);
       return false;
@@ -589,8 +579,7 @@ export const AppProvider = ({ children }) => {
   const deleteGrade = async (id) => {
     setLoading(true);
     try {
-      await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-      const csrftoken = getCookie('csrftoken');
+      const csrftoken = await fetchCsrfToken();
       if (!csrftoken) {
         showMessage('error', 'CSRF token not set. Please refresh and try again.');
         setLoading(false);
@@ -605,7 +594,8 @@ export const AppProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error("Failed to delete grade");
       showMessage("success", "Grade deleted successfully!");
-      fetchGrades();      return true;
+      fetchGrades();
+      return true;
     } catch (error) {
       showMessage("error", `Failed to delete grade: ${error.message}`);
       return false;
@@ -690,8 +680,7 @@ export const AppProvider = ({ children }) => {
     async (subjectCode) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-        const csrftoken = getCookie('csrftoken');
+        const csrftoken = await fetchCsrfToken();
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
           setLoading(false);
@@ -725,8 +714,7 @@ export const AppProvider = ({ children }) => {
     async (subjectCode) => {
       setLoading(true);
       try {
-        await fetch(`${API_BASE_URL}/csrf/`, { credentials: 'include' });
-        const csrftoken = getCookie('csrftoken');
+        const csrftoken = await fetchCsrfToken();
         if (!csrftoken) {
           showMessage('error', 'CSRF token not set. Please refresh and try again.');
           setLoading(false);
