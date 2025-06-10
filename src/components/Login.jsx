@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { LogIn, Loader2 } from "lucide-react";
 import { useApp } from "../contexts/AppContext";
-
-
+import { useAuth } from "../contexts/AuthContext"; // <-- Import useAuth
 
 const getCSRFTokenFromBackend = async () => {
   await fetch("https://brainbox-student-management-system.onrender.com/api/", {
@@ -10,21 +9,22 @@ const getCSRFTokenFromBackend = async () => {
   });
 };
 
-const Login = ({ login, onRegisterClick }) => {
+const Login = ({ onRegisterClick }) => { // <-- Remove login from props
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("teacher");
   const { loading } = useApp();
+  const { login } = useAuth(); // <-- Get login from context
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  await getCSRFTokenFromBackend(); // <-- Fetch CSRF cookie first
-  const success = await login(username, password, role);
-  if (success) {
-    setUsername("");
-    setPassword("");
-  }
-};
+    e.preventDefault();
+    await getCSRFTokenFromBackend();
+    const success = await login(username, password, role);
+    if (success) {
+      setUsername("");
+      setPassword("");
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md font-inter">
