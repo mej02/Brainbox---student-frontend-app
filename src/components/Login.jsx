@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { LogIn, Loader2 } from "lucide-react";
 import { useApp } from "../contexts/AppContext";
 import { useAuth } from "../contexts/AuthContext"; // <-- Import useAuth
+import { getCookie } from "../utils/csrf";
 
 const getCSRFTokenFromBackend = async () => {
-  await fetch("https://brainbox-student-management-system.onrender.com/api/", {
+  await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
     credentials: "include",
   });
 };
@@ -19,7 +20,8 @@ const Login = ({ onRegisterClick }) => { // <-- Remove login from props
   const handleSubmit = async (e) => {
     e.preventDefault();
     await getCSRFTokenFromBackend();
-    const success = await login(username, password, role);
+    const csrftoken = getCookie("csrftoken");
+    const success = await login(username, password, role, csrftoken);
     if (success) {
       setUsername("");
       setPassword("");

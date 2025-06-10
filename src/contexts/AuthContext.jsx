@@ -1,24 +1,9 @@
 import React, { createContext, useContext, useState } from "react";
+import { getCookie } from "../utils/csrf";
 
 export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
-// Helper to get cookie by name
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
 
 export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
@@ -28,19 +13,16 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password, role) => {
     setLoading(true);
     try {
-      const csrfToken = getCookie("csrftoken");
-      console.log("CSRF token being sent:", csrfToken);
-      const headers = {
-        "Content-Type": "application/json",
-      };
-      if (csrfToken) {
-        headers["X-CSRFToken"] = csrfToken;
-      }
+      const csrftoken = getCookie("csrftoken");
+      console.log("CSRF token being sent:", csrftoken);
       const response = await fetch("https://brainbox-student-management-system.onrender.com/api/login/", {
         method: "POST",
         credentials: "include",
-        headers,
-        body: JSON.stringify({ username, password, role }),
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify({ username, password }),
       });
       if (!response.ok) throw new Error("Login failed");
       await response.json();
