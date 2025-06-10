@@ -29,22 +29,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const csrfToken = getCookie("csrftoken");
+      console.log("CSRF token being sent:", csrfToken);
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      if (csrfToken) {
+        headers["X-CSRFToken"] = csrfToken;
+      }
       const response = await fetch("https://brainbox-student-management-system.onrender.com/api/login/", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
+        headers,
         body: JSON.stringify({ username, password, role }),
       });
       if (!response.ok) throw new Error("Login failed");
-      const data = await response.json();
+      await response.json();
       setUserRole(role);
       if (role === "student") setLoggedInStudentId(username);
       setLoading(false);
       return true;
     } catch (error) {
+      console.error("Login error:", error);
       setLoading(false);
       return false;
     }
@@ -55,13 +60,8 @@ export const AuthProvider = ({ children }) => {
     setLoggedInStudentId(null);
   };
 
-  const register = async (username, password, role, studentId) => {
-    // Simulate registration
-    return true;
-  };
-
   return (
-    <AuthContext.Provider value={{ userRole, loggedInStudentId, login, logout, register, loading }}>
+    <AuthContext.Provider value={{ userRole, loggedInStudentId, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
