@@ -1,12 +1,23 @@
-# React + Vite
+# Brainbox---student-frontend-app (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React frontend for the Brainbox Student Management System.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. Clone the repository:
+2. Git clone https://github.com/mej02/Brainbox---student-frontend-app.git cd Brainbox---student-frontend-app
+3. Install dependencies: npm install
+4. Start the development server: npm run dev
+5. The frontend will be available at `http://localhost:5173/`
 
-## Expanding the ESLint configuration
+## Connecting to the Backend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- the frontend expects the backend API at `http://localhost:8000/`.
+- if your backend runs elsewhere, update the API URL in your frontend configuration (e.g., `.env` or directly in your code).
+
+## Related Repositories
+
+- [Backend (Django)](https://github.com/mej02/Brainbox---Student-Management-System)
+
+- Backend: https://github.com/mej02/Brainbox---Student-Management-System
+- Frontend: https://github.com/mej02/Brainbox---student-frontend-app
