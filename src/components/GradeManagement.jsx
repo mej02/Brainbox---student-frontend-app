@@ -176,7 +176,6 @@ export const GradeManagement = () => {
   const handleModalSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure numbers are sent as numbers, not strings
     const payload = {
       student: gradeFormData.student,
       subject: gradeFormData.subject,
@@ -191,6 +190,13 @@ export const GradeManagement = () => {
     } else {
       success = await addGrade(payload);
     }
+    // REMOVE these lines:
+    // if (success) {
+    //   toast.success(editingGrade ? "Grade updated successfully!" : "Grade added successfully!");
+    // } else {
+    //   toast.error("Failed to save grade!");
+    // }
+    // Just reset form/modal:
     if (success) {
       setEditingGrade(null);
       setGradeFormData({
@@ -211,6 +217,12 @@ export const GradeManagement = () => {
 
   const handleConfirmDelete = async () => {
     let success = await deleteGrade(gradeToDelete.id);
+    // REMOVE these lines:
+    // if (success) {
+    //   toast.success("Grade deleted successfully!");
+    // } else {
+    //   toast.error("Failed to delete grade!");
+    // }
     if (success) {
       setIsConfirmModalOpen(false);
       setGradeToDelete(null);
