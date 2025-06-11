@@ -48,18 +48,17 @@ export const StudentProvider = ({ children }) => {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
       const isFormData = student instanceof FormData;
+      const headers = isFormData
+        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+        : {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+            "Authorization": `Bearer ${accessToken}`,
+          };
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
-        headers: {
-          ...(isFormData
-            ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
-            : {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken,
-                "Authorization": `Bearer ${accessToken}`,
-              }),
-        },
+        headers,
         body: isFormData ? student : JSON.stringify(student),
       });
       if (!response.ok) throw new Error("Failed to add student");
@@ -79,18 +78,17 @@ export const StudentProvider = ({ children }) => {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
       const isFormData = data instanceof FormData;
+      const headers = isFormData
+        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+        : {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+            "Authorization": `Bearer ${accessToken}`,
+          };
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
         credentials: "include",
-        headers: {
-          ...(isFormData
-            ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
-            : {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken,
-                "Authorization": `Bearer ${accessToken}`,
-              }),
-        },
+        headers,
         body: isFormData ? data : JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update student");
