@@ -125,9 +125,7 @@ button:focus-visible {
   color: #fff !important;
 }
 
-.Toastify__toast {
-  z-index: 99999 !important;
-}
+.Toastify__toast,
 .Toastify__toast-container {
   z-index: 99999 !important;
 }

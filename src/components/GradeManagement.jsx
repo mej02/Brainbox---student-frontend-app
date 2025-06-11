@@ -230,9 +230,6 @@ export const GradeManagement = () => {
     }
   };
 
-  useEffect(() => {
-    toast.info("Manual test toast");
-  }, []);
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-md font-inter">

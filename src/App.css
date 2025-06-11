@@ -47,3 +47,8 @@
   font-size: 0.85rem;
   gap: 0.5rem;
 }
+
+.Toastify__toast,
+.Toastify__toast-container {
+  z-index: 99999 !important;
+}
