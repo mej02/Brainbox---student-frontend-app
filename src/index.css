@@ -128,6 +128,9 @@ button:focus-visible {
 .Toastify__toast {
   z-index: 99999 !important;
 }
+.Toastify__toast-container {
+  z-index: 99999 !important;
+}
 
 @media (prefers-color-scheme: light) {
   :root {
