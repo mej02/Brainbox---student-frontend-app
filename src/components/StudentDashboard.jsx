@@ -33,13 +33,10 @@ import { getStudentImageUrl, DEFAULT_STUDENT_IMAGE, GENDER_OPTIONS, COURSES, YEA
 // Setup localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
-
-
-
 export const StudentDashboard = ({ loggedInStudentId }) => {
   const { students, fetchStudents, enrollSubject, unenrollSubject, updateStudent } = useStudents();
   const { enrollments, fetchEnrollments } = useEnrollments();
-  const { subjects } = useSubjects();
+  const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
   useApp();
   const { loggedInStudentId: authStudentId } = useAuth();
@@ -85,11 +82,13 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
 
   const currentStudentId = loggedInStudentId || authStudentId;
 
-  // Always call hooks at the top level, not conditionally!
+  // Always fetch everything on mount
   useEffect(() => {
-    if (!students.length) fetchStudents();
-    if (!grades.length) fetchGrades();
-  }, [students.length, grades.length, fetchStudents, fetchGrades]);
+    fetchStudents();
+    fetchGrades();
+    fetchSubjects();
+    fetchEnrollments();
+  }, [fetchStudents, fetchGrades, fetchSubjects, fetchEnrollments]);
 
   useEffect(() => {
     if (currentStudentId) fetchEnrollments();
@@ -226,8 +225,11 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
           className="border px-2 py-1 rounded flex-1"
           value={selectedSubjectCode}
           onChange={(e) => setSelectedSubjectCode(e.target.value)}
+          disabled={!subjects.length}
         >
-          <option value="">Select a subject to enroll</option>
+          <option value="">
+            {subjects.length ? "Select a subject to enroll" : "Loading subjects..."}
+          </option>
           {subjects
             .filter((s) => !enrollments.includes(s.value))
             .map((s) => (
@@ -553,17 +555,17 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             e.preventDefault();
             const formData = new FormData();
             Object.entries(editForm).forEach(([key, value]) => {
-              if (key === "image_preview") return; // Don't send preview
+              if (key === "image_preview") return;
+              if (key === "image" && !value) return;
               if (value !== undefined && value !== null) {
                 formData.append(key, value);
               }
             });
-            // Call updateStudent with FormData
             const success = await updateStudent(
               currentStudent.student_id,
               formData,
               true
-            ); // true = isFormData
+            );
             if (success) setIsEditModalOpen(false);
           }}
           className="space-y-4"
@@ -792,7 +794,6 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                   return (
                     <li key={code} className="flex items-center gap-2">
                       <span>{subj?.label || code}</span>
-                      {/* Optionally add an unenroll button here */}
                     </li>
                   );
                 })
