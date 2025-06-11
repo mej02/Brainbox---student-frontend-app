@@ -23,6 +23,12 @@ function getCookie(name) {
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
+  const ensureCSRFToken = async () => {
+    await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
+      credentials: "include",
+    });
+  };
+
   const fetchGrades = async () => {
     try {
       const response = await fetch(API_URL, {
@@ -43,8 +49,9 @@ export const GradeProvider = ({ children }) => {
 
   const addGrade = async (grade) => {
     try {
-      await ensureCSRFToken(); 
+      await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
+      console.log("CSRF token before POST:", csrfToken); // Add this line
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
@@ -64,7 +71,7 @@ export const GradeProvider = ({ children }) => {
 
   const updateGrade = async (id, data) => {
     try {
-      await ensureCSRFToken(); 
+      await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
@@ -85,7 +92,7 @@ export const GradeProvider = ({ children }) => {
 
   const deleteGrade = async (id) => {
     try {
-      await ensureCSRFToken(); 
+      await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
@@ -112,10 +119,4 @@ export const GradeProvider = ({ children }) => {
       {children}
     </GradeContext.Provider>
   );
-};
-
-const ensureCSRFToken = async () => {
-  await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
-    credentials: "include",
-  });
 };
