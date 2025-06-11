@@ -73,7 +73,7 @@ export const StudentProvider = ({ children }) => {
     try {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}${id}/`, {
+      const response = await fetch(`${API_URL}/${id}/`, { // <-- fixed URL
         method: "PUT",
         credentials: "include",
         headers: {
@@ -99,7 +99,7 @@ export const StudentProvider = ({ children }) => {
     try {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
