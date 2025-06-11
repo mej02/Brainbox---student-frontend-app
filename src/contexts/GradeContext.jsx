@@ -5,21 +5,6 @@ export const useGradeContext = () => useContext(GradeContext);
 
 const API_URL = "https://brainbox-student-management-system.onrender.com/api/grades";
 
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
-
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
@@ -50,14 +35,12 @@ export const GradeProvider = ({ children }) => {
   const addGrade = async (grade) => {
     try {
       await ensureCSRFToken();
-      const csrfToken = getCookie("csrftoken");
-      console.log("CSRF token before POST:", csrfToken); // Add this line
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
+          // No X-CSRFToken header!
         },
         body: JSON.stringify(grade),
       });
@@ -72,13 +55,12 @@ export const GradeProvider = ({ children }) => {
   const updateGrade = async (id, data) => {
     try {
       await ensureCSRFToken();
-      const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
+          // No X-CSRFToken header!
         },
         body: JSON.stringify(data),
       });
@@ -93,12 +75,11 @@ export const GradeProvider = ({ children }) => {
   const deleteGrade = async (id) => {
     try {
       await ensureCSRFToken();
-      const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
-          "X-CSRFToken": csrfToken,
+          // No X-CSRFToken header!
         },
       });
       if (!response.ok) throw new Error("Failed to delete grade");
