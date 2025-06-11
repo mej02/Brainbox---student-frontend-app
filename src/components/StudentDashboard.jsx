@@ -114,6 +114,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
   useEffect(() => {
     if (currentStudent) {
       setEditForm({
+        student_id: currentStudent.student_id, // <-- add this line
         first_name: currentStudent.first_name || "",
         last_name: currentStudent.last_name || "",
         email: currentStudent.email || "",
@@ -561,6 +562,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                 formData.append(key, value);
               }
             });
+            formData.append("student_id", currentStudent.student_id);
             const success = await updateStudent(
               currentStudent.student_id,
               formData,
