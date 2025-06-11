@@ -102,7 +102,9 @@ export const SubjectProvider = ({ children }) => {
   };
 
   const ensureCSRFToken = async () => {
-    // Implementation for ensuring CSRF token
+    await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
+      credentials: "include",
+    });
   };
 
   const login = async () => {
