@@ -24,22 +24,16 @@ function getCookie(name) {
 export const EnrollmentProvider = ({ children }) => {
   const [enrollments, setEnrollments] = useState([]);
 
-  const fetchEnrollments = async () => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch enrollments");
-      const data = await response.json();
-      setEnrollments(data);
-    } catch (error) {
-      console.error("Error fetching enrollments:", error);
-      setEnrollments([]);
-    }
+  const fetchEnrollments = async (token) => {
+    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/enrollments/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!res.ok) throw new Error("Failed to fetch enrollments");
+    const data = await res.json();
+    setEnrollments(data);
   };
 
   const addEnrollment = async (enrollment) => {
@@ -108,7 +102,7 @@ export const EnrollmentProvider = ({ children }) => {
     }
   };
 
-  return (
+ return (
     <EnrollmentContext.Provider value={{
       enrollments,
       fetchEnrollments,

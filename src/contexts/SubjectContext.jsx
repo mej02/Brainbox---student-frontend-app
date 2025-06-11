@@ -9,23 +9,16 @@ const API_URL = "https://brainbox-student-management-system.onrender.com/api/sub
 export const SubjectProvider = ({ children }) => {
   const [subjects, setSubjects] = useState([]);
 
-  const fetchSubjects = async () => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch subjects");
-      const data = await response.json();
-      setSubjects(data);
-    } catch (error) {
-      console.error("Error fetching subjects:", error);
-      setSubjects([]);
-      toast.error("Failed to fetch subjects!");
-    }
+  const fetchSubjects = async (token) => {
+    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/subjects/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!res.ok) throw new Error("Failed to fetch subjects");
+    const data = await res.json();
+    setSubjects(data);
   };
 
   const addSubject = async (subject) => {

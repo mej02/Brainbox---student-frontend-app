@@ -9,23 +9,16 @@ const API_URL = "https://brainbox-student-management-system.onrender.com/api/gra
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
-  const fetchGrades = async () => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch grades");
-      const data = await response.json();
-      setGrades(data);
-    } catch (error) {
-      console.error("Error fetching grades:", error);
-      setGrades([]);
-      toast.error("Failed to fetch grades!");
-    }
+  const fetchGrades = async (token) => {
+    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/grades/', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!res.ok) throw new Error("Failed to fetch grades");
+    const data = await res.json();
+    setGrades(data);
   };
 
   const addGrade = async (grade) => {

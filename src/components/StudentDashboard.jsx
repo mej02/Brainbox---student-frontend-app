@@ -6,28 +6,12 @@ import { useApp } from "../contexts/AppContext";
 import { useAuth } from "../contexts/AuthContext";
 import Modal from "./Modal";
 import { 
-  User, 
-  Building2, 
-  CalendarDays, 
-  Book, 
-  UserCog, 
-  Image, 
-  Phone, 
-  MapPin, 
-  GraduationCap, 
-  Edit, 
-  Trash2, 
-  ChevronLeft, 
-  ChevronRight, 
-  Send 
+  User, Building2, CalendarDays, Book, UserCog, Image, Phone, MapPin, GraduationCap, Edit, Trash2, ChevronLeft, ChevronRight, Send 
 } from "lucide-react";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-
 import { useEnrollments } from "../contexts/EnrollmentContext";
-
-// Utils/constants
 import { getStudentImageUrl, DEFAULT_STUDENT_IMAGE, GENDER_OPTIONS, COURSES, YEAR_LEVELS } from "../utils/constants";
 
 // Setup localizer for react-big-calendar
@@ -39,7 +23,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
   useApp();
-  const { loggedInStudentId: authStudentId } = useAuth();
+  const { token, loggedInStudentId: authStudentId } = useAuth();
 
   const [selectedSubjectCode, setSelectedSubjectCode] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -84,15 +68,15 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
 
   // Always fetch everything on mount
   useEffect(() => {
-    fetchStudents();
-    fetchGrades();
-    fetchSubjects();
-    fetchEnrollments();
-  }, [fetchStudents, fetchGrades, fetchSubjects, fetchEnrollments]);
+    fetchStudents(token);
+    fetchGrades(token);
+    fetchSubjects(token);
+    fetchEnrollments(token);
+  }, [fetchStudents, fetchGrades, fetchSubjects, fetchEnrollments, token]);
 
   useEffect(() => {
-    if (currentStudentId) fetchEnrollments();
-  }, [currentStudentId, fetchEnrollments]);
+    if (currentStudentId) fetchEnrollments(token);
+  }, [currentStudentId, fetchEnrollments, token]);
 
   useEffect(() => {
     if (Array.isArray(events)) {

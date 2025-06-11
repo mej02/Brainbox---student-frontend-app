@@ -24,36 +24,28 @@ function getCookie(name) {
 export const StudentProvider = ({ children }) => {
   const [students, setStudents] = useState([]);
 
-  const fetchStudents = async () => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch students");
-      const data = await response.json();
-      setStudents(data);
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      setStudents([]);
-      toast.error("Failed to fetch students!");
-    }
+  const fetchStudents = async (token) => {
+    const res = await fetch(API_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!res.ok) throw new Error("Failed to fetch students");
+    const data = await res.json();
+    setStudents(data);
   };
 
-  const addStudent = async (student) => {
+  const addStudent = async (student, token) => {
     try {
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
       const isFormData = student instanceof FormData;
       const headers = isFormData
-        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${token}` }
         : {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
-            "Authorization": `Bearer ${accessToken}`,
+            "Authorization": `Bearer ${token}`,
           };
       const response = await fetch(API_URL, {
         method: "POST",
@@ -73,17 +65,16 @@ export const StudentProvider = ({ children }) => {
     }
   };
 
-  const updateStudent = async (id, data) => {
+  const updateStudent = async (id, data, token) => {
     try {
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
       const isFormData = data instanceof FormData;
       const headers = isFormData
-        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+        ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${token}` }
         : {
             "Content-Type": "application/json",
             "X-CSRFToken": csrfToken,
-            "Authorization": `Bearer ${accessToken}`,
+            "Authorization": `Bearer ${token}`,
           };
       const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
@@ -103,16 +94,15 @@ export const StudentProvider = ({ children }) => {
     }
   };
 
-  const deleteStudent = async (id) => {
+  const deleteStudent = async (id, token) => {
     try {
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete student");
