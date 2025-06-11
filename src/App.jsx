@@ -56,7 +56,7 @@ export const MainApp = () => {
                   setShowRegister={setShowRegister}
                 />
                 <Modal />
-                <Notification />
+                
                 <ConfirmationModal />
                 <ToastContainer position="top-right" autoClose={2000} />
               </EnrollmentProvider>
