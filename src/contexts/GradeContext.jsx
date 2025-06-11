@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export const GradeContext = createContext();
 export const useGradeContext = () => useContext(GradeContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/grades";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/grades/";
 
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
@@ -50,7 +50,6 @@ export const GradeProvider = ({ children }) => {
 
   const updateGrade = async (id, data) => {
     try {
-    
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
@@ -71,7 +70,6 @@ export const GradeProvider = ({ children }) => {
 
   const deleteGrade = async (id) => {
     try {
-      
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
