@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { toast } from "react-toastify";
 
 export const GradeContext = createContext();
 export const useGradeContext = () => useContext(GradeContext);
@@ -43,8 +44,10 @@ export const GradeProvider = ({ children }) => {
       if (!response.ok) throw new Error("Failed to add grade");
       const newGrade = await response.json();
       setGrades(prev => [...prev, newGrade]);
+      toast.success("Grade added successfully!");
     } catch (error) {
       console.error("Error adding grade:", error);
+      toast.error("Failed to add grade!");
     }
   };
 
@@ -63,6 +66,7 @@ export const GradeProvider = ({ children }) => {
       if (!response.ok) throw new Error("Failed to update grade");
       const updatedGrade = await response.json();
       setGrades(prev => prev.map(g => g.id === id ? updatedGrade : g));
+      toast.success("Grade updated successfully!");
     } catch (error) {
       console.error("Error updating grade:", error);
     }
@@ -80,6 +84,7 @@ export const GradeProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error("Failed to delete grade");
       setGrades(prev => prev.filter(g => g.id !== id));
+      toast.success("Grade deleted successfully!");
     } catch (error) {
       console.error("Error deleting grade:", error);
     }

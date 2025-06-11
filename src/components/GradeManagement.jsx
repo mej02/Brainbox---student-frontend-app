@@ -6,6 +6,8 @@ import { useApp } from "../contexts/AppContext";
 import Modal from "./Modal";
 import ConfirmationModal from "./ConfirmationModal";
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Search, Loader2, Save, GraduationCap } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const GradeManagement = () => {
   const {
@@ -192,6 +194,7 @@ export const GradeManagement = () => {
       success = await addGrade(payload);
     }
     if (success) {
+      toast.success(editingGrade ? "Grade updated successfully!" : "Grade added successfully!");
       setEditingGrade(null);
       setGradeFormData({
         student: "",
@@ -201,6 +204,8 @@ export const GradeManagement = () => {
         exam: "",
       });
       setIsModalOpen(false);
+    } else {
+      toast.error("Failed to save grade!");
     }
   };
 
@@ -212,8 +217,11 @@ export const GradeManagement = () => {
   const handleConfirmDelete = async () => {
     let success = await deleteGrade(gradeToDelete.id);
     if (success) {
+      toast.success("Grade deleted successfully!");
       setIsConfirmModalOpen(false);
       setGradeToDelete(null);
+    } else {
+      toast.error("Failed to delete grade!");
     }
   };
 
@@ -518,6 +526,7 @@ export const GradeManagement = () => {
           gradeToDelete?.subject
         )}? This action cannot be undone.`}
       />
+      <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
 };
