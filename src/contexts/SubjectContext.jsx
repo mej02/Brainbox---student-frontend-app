@@ -5,20 +5,6 @@ export const useSubjects = () => useContext(SubjectContext);
 
 const API_URL = "https://brainbox-student-management-system.onrender.com/api/subjects";
 
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== "") {
-    const cookies = document.cookie.split(";");
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === name + "=") {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
 
 export const SubjectProvider = ({ children }) => {
   const [subjects, setSubjects] = useState([]);
@@ -95,11 +81,7 @@ export const SubjectProvider = ({ children }) => {
     }
   };
 
-  const ensureCSRFToken = async () => {
-    await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
-      credentials: "include",
-    });
-  };
+
 
   const login = async () => {
     // Implementation for logging in
@@ -112,7 +94,6 @@ export const SubjectProvider = ({ children }) => {
       addSubject,
       updateSubject,
       deleteSubject,
-      ensureCSRFToken,
       login,
     }}>
       {children}
