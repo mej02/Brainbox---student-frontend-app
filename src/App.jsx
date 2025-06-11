@@ -7,7 +7,6 @@ import { SubjectProvider } from "./contexts/SubjectContext";
 import { GradeProvider } from "./contexts/GradeContext";
 import { EnrollmentProvider } from "./contexts/EnrollmentContext";
 import Modal from "./components/Modal";
-import Notification from "./components/Notification";
 import ConfirmationModal from "./components/ConfirmationModal";
 import AppContent from "./contexts/AppContext";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,7 +17,7 @@ export const MainApp = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let timeout = setTimeout(() => setLoading(false), 5000); // 5 seconds max
+    let timeout = setTimeout(() => setLoading(false), 5000);
 
     fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
       credentials: "include",
@@ -26,45 +25,44 @@ export const MainApp = () => {
       .then(() => {
         clearTimeout(timeout);
         setLoading(false);
+        toast.info("Toast test! If you see this, Toastify works.");
       })
       .catch((error) => {
         clearTimeout(timeout);
         console.error("Error fetching CSRF token:", error);
         setLoading(false);
+        toast.error("CSRF fetch failed!");
       });
 
     return () => clearTimeout(timeout);
   }, []);
 
-  useEffect(() => {
-    toast.info("Toast test! If you see this, Toastify works.");
-  }, []);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <AuthProvider>
-      <AppProvider>
-        <StudentProvider>
-          <SubjectProvider>
-            <GradeProvider>
-              <EnrollmentProvider>
-                <AppContent
-                  showRegister={showRegister}
-                  setShowRegister={setShowRegister}
-                />
-                <Modal />
-                
-                <ConfirmationModal />
-                <ToastContainer position="top-right" autoClose={2000} />
-              </EnrollmentProvider>
-            </GradeProvider>
-          </SubjectProvider>
-        </StudentProvider>
-      </AppProvider>
-    </AuthProvider>
+    <>
+      <ToastContainer position="top-right" autoClose={2000} />
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <AuthProvider>
+          <AppProvider>
+            <StudentProvider>
+              <SubjectProvider>
+                <GradeProvider>
+                  <EnrollmentProvider>
+                    <AppContent
+                      showRegister={showRegister}
+                      setShowRegister={setShowRegister}
+                    />
+                    <Modal />
+                    <ConfirmationModal />
+                  </EnrollmentProvider>
+                </GradeProvider>
+              </SubjectProvider>
+            </StudentProvider>
+          </AppProvider>
+        </AuthProvider>
+      )}
+    </>
   );
 };
 
