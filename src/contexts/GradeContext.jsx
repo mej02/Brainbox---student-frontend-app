@@ -8,11 +8,6 @@ const API_URL = "https://brainbox-student-management-system.onrender.com/api/gra
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
-  const ensureCSRFToken = async () => {
-    await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
-      credentials: "include",
-    });
-  };
 
   const fetchGrades = async () => {
     try {
@@ -34,13 +29,14 @@ export const GradeProvider = ({ children }) => {
 
   const addGrade = async (grade) => {
     try {
-      await ensureCSRFToken();
+      
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          // No X-CSRFToken header!
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(grade),
       });
@@ -54,13 +50,14 @@ export const GradeProvider = ({ children }) => {
 
   const updateGrade = async (id, data) => {
     try {
-      await ensureCSRFToken();
+    
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          // No X-CSRFToken header!
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(data),
       });
@@ -74,12 +71,13 @@ export const GradeProvider = ({ children }) => {
 
   const deleteGrade = async (id) => {
     try {
-      await ensureCSRFToken();
+      
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
-          // No X-CSRFToken header!
+          "Authorization": `Bearer ${accessToken}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete grade");

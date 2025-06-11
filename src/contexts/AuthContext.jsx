@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
-import { getCookie } from "../utils/csrf";
 
 export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
-
 
 export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
@@ -13,19 +11,17 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password, role) => {
     setLoading(true);
     try {
-      const csrftoken = getCookie("csrftoken");
-      console.log("CSRF token being sent:", csrftoken);
-      const response = await fetch("https://brainbox-student-management-system.onrender.com/api/login/", {
+      const response = await fetch("https://brainbox-student-management-system.onrender.com/api/token/", {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": csrftoken,
         },
         body: JSON.stringify({ username, password }),
       });
       if (!response.ok) throw new Error("Login failed");
-      await response.json();
+      const data = await response.json(); // { access: "...", refresh: "..." }
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
       setUserRole(role);
       if (role === "student") setLoggedInStudentId(username);
       setLoading(false);

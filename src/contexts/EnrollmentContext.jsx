@@ -51,12 +51,14 @@ export const EnrollmentProvider = ({ children }) => {
     try {
       await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(enrollment),
       });
@@ -72,12 +74,14 @@ export const EnrollmentProvider = ({ children }) => {
     try {
       await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(data),
       });
@@ -93,11 +97,13 @@ export const EnrollmentProvider = ({ children }) => {
     try {
       await ensureCSRFToken();
       const csrfToken = getCookie("csrftoken");
+      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "X-CSRFToken": csrfToken,
+          "Authorization": `Bearer ${accessToken}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete enrollment");
