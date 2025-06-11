@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 export const EnrollmentContext = createContext();
 export const useEnrollments = () => useContext(EnrollmentContext);
@@ -20,34 +21,40 @@ function getCookie(name) {
   return cookieValue;
 }
 
-
 export const EnrollmentProvider = ({ children }) => {
   const [enrollments, setEnrollments] = useState([]);
+  const { token } = useAuth();
 
-  const fetchEnrollments = async (token) => {
-    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/enrollments/', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!res.ok) throw new Error("Failed to fetch enrollments");
-    const data = await res.json();
-    setEnrollments(data);
-  };
+  // Use useCallback to avoid infinite loop in useEffect
+  const fetchEnrollments = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!res.ok) throw new Error("Failed to fetch enrollments");
+      const data = await res.json();
+      setEnrollments(data);
+    } catch (error) {
+      console.error("Error fetching enrollments:", error);
+      setEnrollments([]); // Prevents infinite error loop
+    }
+  }, [token]);
 
   const addEnrollment = async (enrollment) => {
     try {
-   
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
+      if (!token) throw new Error("No auth token");
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(enrollment),
       });
@@ -61,16 +68,15 @@ export const EnrollmentProvider = ({ children }) => {
 
   const updateEnrollment = async (id, data) => {
     try {
-     
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/${id}/`, {
+      if (!token) throw new Error("No auth token");
+      const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
           "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -84,15 +90,14 @@ export const EnrollmentProvider = ({ children }) => {
 
   const deleteEnrollment = async (id) => {
     try {
-     
       const csrfToken = getCookie("csrftoken");
-      const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/${id}/`, {
+      if (!token) throw new Error("No auth token");
+      const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete enrollment");
@@ -102,7 +107,11 @@ export const EnrollmentProvider = ({ children }) => {
     }
   };
 
- return (
+  useEffect(() => {
+    fetchEnrollments();
+  }, [fetchEnrollments]);
+
+  return (
     <EnrollmentContext.Provider value={{
       enrollments,
       fetchEnrollments,

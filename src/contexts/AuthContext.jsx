@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [loggedInStudentId, setLoggedInStudentId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem("access_token") || null);
 
   const login = async (username, password, role) => {
     setLoading(true);
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json(); // { access: "...", refresh: "..." }
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
+      setToken(data.access);
       setUserRole(role);
       if (role === "student") setLoggedInStudentId(username);
       setLoading(false);
@@ -36,10 +38,11 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUserRole(null);
     setLoggedInStudentId(null);
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, loggedInStudentId, login, logout, loading }}>
+    <AuthContext.Provider value={{ token, userRole, loggedInStudentId, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
