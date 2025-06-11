@@ -9,7 +9,6 @@ const API_URL = "https://brainbox-student-management-system.onrender.com/api/gra
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
-
   const fetchGrades = async () => {
     try {
       const response = await fetch(API_URL, {
@@ -25,6 +24,7 @@ export const GradeProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching grades:", error);
       setGrades([]);
+      toast.error("Failed to fetch grades!");
     }
   };
 
