@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export const EnrollmentContext = createContext();
 export const useEnrollments = () => useContext(EnrollmentContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/enrollments";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/enrollments/";
 
 function getCookie(name) {
   let cookieValue = null;
@@ -20,11 +20,6 @@ function getCookie(name) {
   return cookieValue;
 }
 
-const ensureCSRFToken = async () => {
-  await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
-    credentials: "include",
-  });
-};
 
 export const EnrollmentProvider = ({ children }) => {
   const [enrollments, setEnrollments] = useState([]);
@@ -49,7 +44,7 @@ export const EnrollmentProvider = ({ children }) => {
 
   const addEnrollment = async (enrollment) => {
     try {
-      await ensureCSRFToken();
+   
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
@@ -72,7 +67,7 @@ export const EnrollmentProvider = ({ children }) => {
 
   const updateEnrollment = async (id, data) => {
     try {
-      await ensureCSRFToken();
+     
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
@@ -95,7 +90,7 @@ export const EnrollmentProvider = ({ children }) => {
 
   const deleteEnrollment = async (id) => {
     try {
-      await ensureCSRFToken();
+     
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}/${id}/`, {
