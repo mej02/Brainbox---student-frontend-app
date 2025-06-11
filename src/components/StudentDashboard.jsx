@@ -383,7 +383,8 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                     >
                       <span>{subj?.label || code}</span>
                       <button
-                        className="text-red-600 hover:underline text-sm"
+                        type="button"
+                        className="text-red-600 hover:underline text-xs"
                         onClick={() => unenrollSubject(code)}
                       >
                         Unenroll
@@ -776,6 +777,29 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               )}
             </div>
           </div>
+
+          {/* Show enrolled subjects in Edit Profile modal */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Enrolled Subjects
+            </label>
+            <ul className="space-y-1">
+              {enrollments.length === 0 ? (
+                <li className="text-gray-500 text-sm">No enrolled subjects.</li>
+              ) : (
+                enrollments.map((code) => {
+                  const subj = subjects.find((s) => s.value === code);
+                  return (
+                    <li key={code} className="flex items-center gap-2">
+                      <span>{subj?.label || code}</span>
+                      {/* Optionally add an unenroll button here */}
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>
+
           <div className="flex justify-end space-x-3 mt-6">
             <button
               type="button"
