@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export const GradeContext = createContext();
 export const useGradeContext = () => useContext(GradeContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/grades";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/grades/";
 
 export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
