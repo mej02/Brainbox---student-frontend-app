@@ -114,8 +114,8 @@ export const GradeProvider = ({ children }) => {
   );
 };
 
-export async function ensureCSRFToken() {
+const ensureCSRFToken = async () => {
   await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
     credentials: "include",
   });
-}
+};
