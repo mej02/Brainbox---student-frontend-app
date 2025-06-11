@@ -23,7 +23,26 @@ function getCookie(name) {
 
 export const EnrollmentProvider = ({ children }) => {
   const [enrollments, setEnrollments] = useState([]);
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
+
+  // Helper to handle token errors
+  const handleTokenError = async (res) => {
+    if (res.status === 401) {
+      try {
+        const errorData = await res.json();
+        if (
+          errorData?.detail === "Given token not valid for any token type" ||
+          errorData?.code === "token_not_valid"
+        ) {
+          logout();
+          window.location.reload();
+        }
+      } catch {
+        logout();
+        window.location.reload();
+      }
+    }
+  };
 
   // Use useCallback to avoid infinite loop in useEffect
   const fetchEnrollments = useCallback(async () => {
@@ -35,6 +54,10 @@ export const EnrollmentProvider = ({ children }) => {
           'Content-Type': 'application/json'
         }
       });
+      if (res.status === 401) {
+        await handleTokenError(res);
+        return;
+      }
       if (!res.ok) throw new Error("Failed to fetch enrollments");
       const data = await res.json();
       setEnrollments(data);
@@ -58,6 +81,10 @@ export const EnrollmentProvider = ({ children }) => {
         },
         body: JSON.stringify(enrollment),
       });
+      if (response.status === 401) {
+        await handleTokenError(response);
+        return;
+      }
       if (!response.ok) throw new Error("Failed to add enrollment");
       const newEnrollment = await response.json();
       setEnrollments(prev => [...prev, newEnrollment]);
@@ -80,6 +107,10 @@ export const EnrollmentProvider = ({ children }) => {
         },
         body: JSON.stringify(data),
       });
+      if (response.status === 401) {
+        await handleTokenError(response);
+        return;
+      }
       if (!response.ok) throw new Error("Failed to update enrollment");
       const updatedEnrollment = await response.json();
       setEnrollments(prev => prev.map(e => e.id === id ? updatedEnrollment : e));
@@ -100,6 +131,10 @@ export const EnrollmentProvider = ({ children }) => {
           "Authorization": `Bearer ${token}`,
         },
       });
+      if (response.status === 401) {
+        await handleTokenError(response);
+        return;
+      }
       if (!response.ok) throw new Error("Failed to delete enrollment");
       setEnrollments(prev => prev.filter(e => e.id !== id));
     } catch (error) {
