@@ -9,7 +9,7 @@ import { EnrollmentProvider } from "./contexts/EnrollmentContext";
 import Modal from "./components/Modal";
 import ConfirmationModal from "./components/ConfirmationModal";
 import AppContent from "./contexts/AppContext";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const MainApp = () => {
@@ -25,13 +25,11 @@ export const MainApp = () => {
       .then(() => {
         clearTimeout(timeout);
         setLoading(false);
-        toast.info("Toast test! If you see this, Toastify works.");
       })
       .catch((error) => {
         clearTimeout(timeout);
         console.error("Error fetching CSRF token:", error);
         setLoading(false);
-        toast.error("CSRF fetch failed!");
       });
 
     return () => clearTimeout(timeout);
