@@ -30,7 +30,6 @@ export const GradeProvider = ({ children }) => {
 
   const addGrade = async (grade) => {
     try {
-      
       const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
         method: "POST",
@@ -45,9 +44,11 @@ export const GradeProvider = ({ children }) => {
       const newGrade = await response.json();
       setGrades(prev => [...prev, newGrade]);
       toast.success("Grade added successfully!");
+      return true;
     } catch (error) {
       console.error("Error adding grade:", error);
       toast.error("Failed to add grade!");
+      return false;
     }
   };
 
@@ -67,8 +68,11 @@ export const GradeProvider = ({ children }) => {
       const updatedGrade = await response.json();
       setGrades(prev => prev.map(g => g.id === id ? updatedGrade : g));
       toast.success("Grade updated successfully!");
+      return true;
     } catch (error) {
       console.error("Error updating grade:", error);
+      toast.error("Failed to update grade!");
+      return false;
     }
   };
 
@@ -85,8 +89,11 @@ export const GradeProvider = ({ children }) => {
       if (!response.ok) throw new Error("Failed to delete grade");
       setGrades(prev => prev.filter(g => g.id !== id));
       toast.success("Grade deleted successfully!");
+      return true;
     } catch (error) {
       console.error("Error deleting grade:", error);
+      toast.error("Failed to delete grade!");
+      return false;
     }
   };
 
