@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 export const StudentContext = createContext();
 export const useStudents = () => useContext(StudentContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/students";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/students/"; // <-- add trailing slash
 
 function getCookie(name) {
   let cookieValue = null;
