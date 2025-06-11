@@ -21,6 +21,12 @@ function getCookie(name) {
   return cookieValue;
 }
 
+const ensureCSRFToken = async () => {
+  await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
+    credentials: "include",
+  });
+};
+
 export const StudentProvider = ({ children }) => {
   const [students, setStudents] = useState([]);
  
@@ -44,6 +50,7 @@ const fetchStudents = async () => {
   
   const addStudent = async (student) => {
   try {
+    await ensureCSRFToken(); 
     const csrfToken = getCookie("csrftoken");
     const response = await fetch(API_URL, {
       method: "POST",
@@ -65,6 +72,7 @@ const fetchStudents = async () => {
 
   const updateStudent = async (id, data) => {
   try {
+    await ensureCSRFToken(); 
     const csrfToken = getCookie("csrftoken");
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
@@ -86,6 +94,7 @@ const fetchStudents = async () => {
 
   const deleteStudent = async (id) => {
   try {
+    await ensureCSRFToken(); 
     const csrfToken = getCookie("csrftoken");
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",

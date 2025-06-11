@@ -21,11 +21,9 @@ const Login = ({ onRegisterClick }) => { // <-- Remove login from props
     e.preventDefault();
     await getCSRFTokenFromBackend();
     const csrftoken = getCookie("csrftoken");
-    const success = await login(username, password, role, csrftoken);
-    if (success) {
-      setUsername("");
-      setPassword("");
-    }
+    await login(username, password, role, csrftoken);
+    setUsername("");
+    setPassword("");
   };
 
   return (

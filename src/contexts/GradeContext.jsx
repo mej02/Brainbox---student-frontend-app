@@ -43,6 +43,7 @@ export const GradeProvider = ({ children }) => {
 
   const addGrade = async (grade) => {
     try {
+      await ensureCSRFToken(); 
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(API_URL, {
         method: "POST",
@@ -63,6 +64,7 @@ export const GradeProvider = ({ children }) => {
 
   const updateGrade = async (id, data) => {
     try {
+      await ensureCSRFToken(); 
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
@@ -83,6 +85,7 @@ export const GradeProvider = ({ children }) => {
 
   const deleteGrade = async (id) => {
     try {
+      await ensureCSRFToken(); 
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
@@ -110,3 +113,9 @@ export const GradeProvider = ({ children }) => {
     </GradeContext.Provider>
   );
 };
+
+export async function ensureCSRFToken() {
+  await fetch("https://brainbox-student-management-system.onrender.com/api/csrf/", {
+    credentials: "include",
+  });
+}

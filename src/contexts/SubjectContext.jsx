@@ -43,6 +43,7 @@ export const SubjectProvider = ({ children }) => {
 
   const addSubject = async (subject) => {
     try {
+      await ensureCSRFToken(); // <-- Add this line
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(API_URL, {
         method: "POST",
@@ -63,6 +64,7 @@ export const SubjectProvider = ({ children }) => {
 
   const updateSubject = async (id, data) => {
     try {
+      await ensureCSRFToken(); // <-- Add this line
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
@@ -83,6 +85,7 @@ export const SubjectProvider = ({ children }) => {
 
   const deleteSubject = async (id) => {
     try {
+      await ensureCSRFToken(); // <-- Add this line
       const csrfToken = getCookie("csrftoken");
       const response = await fetch(`${API_URL}/${id}/`, {
         method: "DELETE",
@@ -98,6 +101,14 @@ export const SubjectProvider = ({ children }) => {
     }
   };
 
+  const ensureCSRFToken = async () => {
+    // Implementation for ensuring CSRF token
+  };
+
+  const login = async () => {
+    // Implementation for logging in
+  };
+
   return (
     <SubjectContext.Provider value={{
       subjects,
@@ -105,6 +116,8 @@ export const SubjectProvider = ({ children }) => {
       addSubject,
       updateSubject,
       deleteSubject,
+      ensureCSRFToken,
+      login,
     }}>
       {children}
     </SubjectContext.Provider>
