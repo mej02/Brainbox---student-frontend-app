@@ -158,3 +158,20 @@ export const EnrollmentProvider = ({ children }) => {
     </EnrollmentContext.Provider>
   );
 };
+
+// Component to display enrollments
+const EnrollmentList = () => {
+  const { enrollments } = useEnrollments();
+
+  return (
+    <ul>
+      {enrollments.map(e => (
+        <li key={e.id}>
+          {e.subject_details?.name || e.subject}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default EnrollmentList;
