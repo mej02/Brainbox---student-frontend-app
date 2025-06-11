@@ -47,15 +47,20 @@ export const StudentProvider = ({ children }) => {
     try {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
+      const isFormData = student instanceof FormData;
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          ...(isFormData
+            ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+            : {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+                "Authorization": `Bearer ${accessToken}`,
+              }),
         },
-        body: JSON.stringify(student),
+        body: isFormData ? student : JSON.stringify(student),
       });
       if (!response.ok) throw new Error("Failed to add student");
       const newStudent = await response.json();
@@ -73,19 +78,24 @@ export const StudentProvider = ({ children }) => {
     try {
       const csrfToken = getCookie("csrftoken");
       const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/${id}/`, { // <-- fixed URL
+      const isFormData = data instanceof FormData;
+      const response = await fetch(`${API_URL}/${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${accessToken}`,
+          ...(isFormData
+            ? { "X-CSRFToken": csrfToken, "Authorization": `Bearer ${accessToken}` }
+            : {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+                "Authorization": `Bearer ${accessToken}`,
+              }),
         },
-        body: JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed to update student");
       const updatedStudent = await response.json();
-      setStudents(prev => prev.map(s => s.id === id ? updatedStudent : s));
+      setStudents(prev => prev.map(s => s.student_id === id ? updatedStudent : s));
       toast.success("Student updated successfully!");
       return true;
     } catch (error) {
