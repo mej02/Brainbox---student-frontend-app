@@ -10,7 +10,7 @@ import Modal from "./components/Modal";
 import Notification from "./components/Notification";
 import ConfirmationModal from "./components/ConfirmationModal";
 import AppContent from "./contexts/AppContext";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const MainApp = () => {
@@ -36,6 +36,10 @@ export const MainApp = () => {
     return () => clearTimeout(timeout);
   }, []);
 
+  useEffect(() => {
+    toast.info("Toast test! If you see this, Toastify works.");
+  }, []);
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -54,7 +58,7 @@ export const MainApp = () => {
                 <Modal />
                 <Notification />
                 <ConfirmationModal />
-                <ToastContainer />
+                <ToastContainer position="top-right" autoClose={2000} />
               </EnrollmentProvider>
             </GradeProvider>
           </SubjectProvider>
