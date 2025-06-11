@@ -361,18 +361,16 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                   You have no enrolled subjects.
                 </li>
               ) : (
-                enrollments.map((code) => {
-                  const subj = subjects.find((s) => s.value === code);
+                enrollments.map((enrollment) => {
+                  // Use enrollment.subject or enrollment.subject_details
+                  const subj = subjects.find((s) => s.value === enrollment.subject);
                   return (
-                    <li
-                      key={code}
-                      className="flex justify-between items-center border p-2 rounded"
-                    >
-                      <span>{subj?.label || code}</span>
+                    <li key={enrollment.id} className="flex justify-between items-center border p-2 rounded">
+                      <span>{subj?.label || enrollment.subject_details?.name || enrollment.subject}</span>
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
-                        onClick={() => unenrollSubject(code)}
+                        onClick={() => unenrollSubject(enrollment.subject)}
                       >
                         Unenroll
                       </button>
