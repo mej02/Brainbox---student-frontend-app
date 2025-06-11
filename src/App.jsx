@@ -10,6 +10,8 @@ import Modal from "./components/Modal";
 import Notification from "./components/Notification";
 import ConfirmationModal from "./components/ConfirmationModal";
 import AppContent from "./contexts/AppContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const MainApp = () => {
   const [showRegister, setShowRegister] = useState(false);
@@ -38,18 +40,21 @@ export const MainApp = () => {
     return <LoadingSpinner />;
   }
 
-
   return (
-      <AuthProvider>
-        <AppProvider>
-          <StudentProvider>
-            <SubjectProvider>
-              <GradeProvider>
-                <EnrollmentProvider>
-                  <AppContent showRegister={showRegister} setShowRegister={setShowRegister} />
-                  <Modal />
-                  <Notification />
-                  <ConfirmationModal />
+    <AuthProvider>
+      <AppProvider>
+        <StudentProvider>
+          <SubjectProvider>
+            <GradeProvider>
+              <EnrollmentProvider>
+                <AppContent
+                  showRegister={showRegister}
+                  setShowRegister={setShowRegister}
+                />
+                <Modal />
+                <Notification />
+                <ConfirmationModal />
+                <ToastContainer />
               </EnrollmentProvider>
             </GradeProvider>
           </SubjectProvider>
