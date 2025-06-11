@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export const StudentContext = createContext();
 export const useStudents = () => useContext(StudentContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/students/";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/students";
 
 
 function getCookie(name) {
@@ -72,7 +72,7 @@ const fetchStudents = async () => {
      
     const csrfToken = getCookie("csrftoken");
     const accessToken = localStorage.getItem("access_token");
-    const response = await fetch(`${API_URL}/${id}`, {
+    const response = await fetch(`${API_URL}${id}/`, {
       method: "PUT",
       credentials: "include",
       headers: {

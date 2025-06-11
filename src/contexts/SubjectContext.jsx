@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export const SubjectContext = createContext();
 export const useSubjects = () => useContext(SubjectContext);
 
-const API_URL = "https://brainbox-student-management-system.onrender.com/api/subjects/";
+const API_URL = "https://brainbox-student-management-system.onrender.com/api/subjects";
 
 
 export const SubjectProvider = ({ children }) => {
@@ -49,7 +49,7 @@ export const SubjectProvider = ({ children }) => {
   const updateSubject = async (id, data) => {
     try {
       const accessToken = localStorage.getItem("access_token");
-      const response = await fetch(`${API_URL}/${id}/`, {
+      const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
