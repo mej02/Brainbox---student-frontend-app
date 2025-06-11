@@ -6,6 +6,7 @@ import { useApp } from "../contexts/AppContext";
 import Modal from "./Modal";
 import ConfirmationModal from "./ConfirmationModal";
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Search, Loader2, Save, GraduationCap } from "lucide-react";
+import { toast } from "react-toastify";
 
 export const GradeManagement = () => {
   const {
@@ -228,6 +229,10 @@ export const GradeManagement = () => {
       setGradeToDelete(null);
     }
   };
+
+  useEffect(() => {
+    toast.info("Manual test toast");
+  }, []);
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-md font-inter">
