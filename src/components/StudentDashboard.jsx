@@ -97,7 +97,8 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
     fetchGrades(token);
     fetchSubjects(token);
     fetchEnrollments(token);
-  }, [fetchStudents, fetchGrades, fetchSubjects, fetchEnrollments, token]);
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (currentStudentId) fetchEnrollments(token);
@@ -243,7 +244,10 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               : "Loading subjects..."}
           </option>
           {subjects
-            .filter((s) => !enrollments.includes(s.value))
+            .filter(
+              (s) =>
+                !enrollments.some((enrollment) => enrollment.subject === s.value)
+            )
             .map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
@@ -408,7 +412,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
-                        onClick={() => unenrollSubject(enrollment.subject)}
+                        onClick={() => unenrollSubject(enrollment.id)}
                       >
                         Unenroll
                       </button>
