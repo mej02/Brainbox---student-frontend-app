@@ -240,7 +240,11 @@ const StudentsManagement = () => {
       const formData = new FormData();
       Object.entries(studentFormData).forEach(([key, value]) => {
         if (key === "current_image_url") return;
-        formData.append(key, value);
+        if (key === "image") {
+          if (value) formData.append(key, value);
+        } else {
+          formData.append(key, value == null ? "" : String(value));
+        }
       });
       const result = await addStudent(formData, token);
       if (!result) {
@@ -572,7 +576,7 @@ const StudentsManagement = () => {
               Section
             </label>
             <input
-              type="number"
+              type="text"
               id="section"
               name="section"
               value={studentFormData.section}
