@@ -219,6 +219,9 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
     return null; // Or render an error message, depending on desired behavior
   }
 
+  console.log("subjects", subjects);
+  console.log("enrollments", enrollments);
+
   return (
     <div className="p-6 bg-white rounded-xl shadow-md font-inter min-h-[90vh]">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center">
@@ -238,10 +241,26 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               : "Loading subjects..."}
           </option>
           {subjects
-            .filter(
-              (s) =>
-                !enrollments.some((enrollment) => enrollment.subject === s.value)
-            )
+            .filter((s) => {
+              // Try to match both string and object cases
+              return !enrollments.some((enrollment) => {
+                if (typeof enrollment.subject === "object" && enrollment.subject !== null) {
+                  return (
+                    enrollment.subject.value === s.value ||
+                    enrollment.subject.id === s.value ||
+                    enrollment.subject === s.value
+                  );
+                }
+                // Also check subject_details if present
+                if (enrollment.subject_details && enrollment.subject_details.code) {
+                  return enrollment.subject_details.code === s.value;
+                }
+                return (
+                  enrollment.subject === s.value ||
+                  enrollment.subject === s.id
+                );
+              });
+            })
             .map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
@@ -417,7 +436,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                     </li>
                   );
                 })
-              )}
+              }
             </ul>
           </div>
         </div>
