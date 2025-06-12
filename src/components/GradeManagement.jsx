@@ -3,10 +3,11 @@ import { useGradeContext } from "../contexts/GradeContext";
 import { useStudents } from "../contexts/StudentContext";
 import { useSubjects } from "../contexts/SubjectContext";
 import { useApp } from "../contexts/AppContext";
+import { useAuth } from "../contexts/AuthContext";
 import Modal from "./Modal";
 import ConfirmationModal from "./ConfirmationModal";
 import { Plus, Edit, Trash2, ChevronUp, ChevronDown, Search, Loader2, Save, GraduationCap } from "lucide-react";
-import { toast } from "react-toastify";
+
 
 export const GradeManagement = () => {
   const {
@@ -21,6 +22,7 @@ export const GradeManagement = () => {
   const { students } = useStudents();
   const { subjects } = useSubjects();
   const { loading } = useApp();
+  const { token } = useAuth();
 
   const getStudentName = React.useCallback(
     (studentId) => {
@@ -187,9 +189,9 @@ export const GradeManagement = () => {
 
     let success;
     if (editingGrade) {
-      success = await updateGrade(editingGrade.id, payload);
+      success = await updateGrade(editingGrade.id, payload, token);
     } else {
-      success = await addGrade(payload);
+      success = await addGrade(payload, token);
     }
     // REMOVE these lines:
     // if (success) {
@@ -217,7 +219,7 @@ export const GradeManagement = () => {
   };
 
   const handleConfirmDelete = async () => {
-    let success = await deleteGrade(gradeToDelete.id);
+    let success = await deleteGrade(gradeToDelete.id, token);
     // REMOVE these lines:
     // if (success) {
     //   toast.success("Grade deleted successfully!");

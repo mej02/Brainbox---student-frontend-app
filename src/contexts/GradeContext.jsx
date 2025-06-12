@@ -10,7 +10,7 @@ export const GradeProvider = ({ children }) => {
   const [grades, setGrades] = useState([]);
 
   const fetchGrades = async (token) => {
-    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/grades/', {
+    const res = await fetch(API_URL, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -21,15 +21,15 @@ export const GradeProvider = ({ children }) => {
     setGrades(data);
   };
 
-  const addGrade = async (grade) => {
+  // Accept token as parameter
+  const addGrade = async (grade, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(grade),
       });
@@ -45,15 +45,14 @@ export const GradeProvider = ({ children }) => {
     }
   };
 
-  const updateGrade = async (id, data) => {
+  const updateGrade = async (id, data, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -69,14 +68,13 @@ export const GradeProvider = ({ children }) => {
     }
   };
 
-  const deleteGrade = async (id) => {
+  const deleteGrade = async (id, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete grade");

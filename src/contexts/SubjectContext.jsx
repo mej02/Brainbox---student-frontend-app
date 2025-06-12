@@ -10,7 +10,7 @@ export const SubjectProvider = ({ children }) => {
   const [subjects, setSubjects] = useState([]);
 
   const fetchSubjects = async (token) => {
-    const res = await fetch('https://brainbox-student-management-system.onrender.com/api/subjects/', {
+    const res = await fetch(API_URL, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -21,14 +21,14 @@ export const SubjectProvider = ({ children }) => {
     setSubjects(data);
   };
 
-  const addSubject = async (subject) => {
+  // Accept token as parameter
+  const addSubject = async (subject, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(subject),
       });
@@ -44,14 +44,13 @@ export const SubjectProvider = ({ children }) => {
     }
   };
 
-  const updateSubject = async (id, data) => {
+  const updateSubject = async (id, data, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(data),
       });
@@ -67,13 +66,12 @@ export const SubjectProvider = ({ children }) => {
     }
   };
 
-  const deleteSubject = async (id) => {
+  const deleteSubject = async (id, token) => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${token}`,
         },
       });
       if (!response.ok) throw new Error("Failed to delete subject");
