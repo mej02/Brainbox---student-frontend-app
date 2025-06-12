@@ -37,8 +37,9 @@ import {
 const localizer = momentLocalizer(moment);
 
 export const StudentDashboard = ({ loggedInStudentId }) => {
-  const { enrollments, fetchEnrollments, deleteEnrollment } = useEnrollments();
-  const { students, fetchStudents, enrollSubject, updateStudent } = useStudents();
+  const { enrollments, fetchEnrollments, addEnrollment, deleteEnrollment } =
+    useEnrollments();
+  const { students, fetchStudents, updateStudent } = useStudents();
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
   useApp();
@@ -240,20 +241,19 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               ? "Select a subject to enroll"
               : "Loading subjects..."}
           </option>
-          {subjects
-            .map((s) => (
-              <option key={s.code} value={s.code}>
-                {s.name}
-              </option>
-            ))}
+          {subjects.map((s) => (
+            <option key={s.code} value={s.code}>
+              {s.name}
+            </option>
+          ))}
         </select>
         <button
           className="bg-[#204032] text-white px-4 py-1 rounded hover:bg-[#183024] transition"
           onClick={async () => {
             if (!selectedSubjectCode) return;
-            await enrollSubject(selectedSubjectCode);
+            await addEnrollment({ subject: selectedSubjectCode });
             setSelectedSubjectCode("");
-            await fetchEnrollments(token); // <-- refresh after enrolling
+            await fetchEnrollments(token);
           }}
         >
           Enroll
@@ -584,7 +584,11 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               }
             });
             formData.append("student_id", currentStudent.student_id);
-            const success = await updateStudent(currentStudent.student_id, formData, token); // <-- use token here
+            const success = await updateStudent(
+              currentStudent.student_id,
+              formData,
+              token
+            ); // <-- use token here
             if (success) setIsEditModalOpen(false);
           }}
           className="space-y-4"
