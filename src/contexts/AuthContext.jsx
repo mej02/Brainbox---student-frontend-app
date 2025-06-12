@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error("Login failed");
       const data = await response.json(); // { access: "...", refresh: "..." }
-      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("token", data.access); // <-- use "token" here
       localStorage.setItem("refresh_token", data.refresh);
       setToken(data.access);
       setUserRole(role);
@@ -38,7 +38,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUserRole(null);
     setLoggedInStudentId(null);
-    setToken(null);
+    setToken("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
   };
 
   return (

@@ -37,7 +37,7 @@ import {
 const localizer = momentLocalizer(moment);
 
 export const StudentDashboard = ({ loggedInStudentId }) => {
-  const { enrollments, fetchEnrollments, unenrollSubject } = useEnrollments();
+  const { enrollments, fetchEnrollments, deleteEnrollment } = useEnrollments();
   const { students, fetchStudents, enrollSubject, updateStudent } = useStudents();
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
@@ -406,7 +406,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
-                        onClick={() => unenrollSubject(enrollment.id)}
+                        onClick={() => deleteEnrollment(enrollment.id)}
                       >
                         Unenroll
                       </button>

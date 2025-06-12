@@ -161,7 +161,7 @@ export const EnrollmentProvider = ({ children }) => {
 
 // Component to display enrollments
 const EnrollmentList = () => {
-  const { enrollments } = useEnrollments();
+  const { enrollments, fetchEnrollments, deleteEnrollment } = useEnrollments();
 
   return (
     <ul>
