@@ -242,7 +242,12 @@ const StudentsManagement = () => {
         if (key === "current_image_url") return;
         formData.append(key, value);
       });
-      success = await addStudent(formData, token);
+      const result = await addStudent(formData, token);
+      if (!result) {
+        setFormError("Failed to add student. Please check all required fields.");
+      } else {
+        setIsModalOpen(false);
+      }
     }
     if (success) {
       setIsModalOpen(false);
