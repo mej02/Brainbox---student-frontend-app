@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { BookOpenText, Plus, Edit, Trash2, X, ChevronUp, ChevronDown, Search, Loader2, Save } from "lucide-react";
 import { useSubjects } from "../contexts/SubjectContext";
 import { useApp } from "../contexts/AppContext";
+import { useAuth } from "../contexts/AuthContext";
 import Modal from "./Modal";
 import ConfirmationModal from "./ConfirmationModal";
 
 const SubjectManagement = () => {
   const { subjects, fetchSubjects, addSubject, updateSubject, deleteSubject } = useSubjects();
-
+  const { token } = useAuth();
   const { loading } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subjectFormData, setSubjectFormData] = useState({
@@ -27,8 +28,8 @@ const SubjectManagement = () => {
   });
 
   useEffect(() => {
-    fetchSubjects();
-  }, []);
+    fetchSubjects(token);
+  }, [fetchSubjects, token]);
 
 
   const filteredAndSortedSubjects = React.useMemo(() => {
@@ -105,19 +106,16 @@ const SubjectManagement = () => {
 
   const handleModalSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       ...subjectFormData,
       units: parseFloat(subjectFormData.units),
     };
-
     let success;
     if (editingSubject) {
-      success = await updateSubject(editingSubject.code, payload);
+      success = await updateSubject(editingSubject.code, payload, token);
     } else {
-      success = await addSubject(payload);
+      success = await addSubject(payload, token);
     }
-
     if (success) {
       setEditingSubject(null);
       setSubjectFormData({ code: "", name: "", description: "", units: "" });
@@ -131,7 +129,7 @@ const SubjectManagement = () => {
   };
 
   const handleConfirmDelete = async () => {
-    let success = await deleteSubject(subjectToDelete.code);
+    let success = await deleteSubject(subjectToDelete.code, token);
     if (success) {
       setIsConfirmModalOpen(false);
       setSubjectToDelete(null);
