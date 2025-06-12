@@ -5,20 +5,45 @@ import { useGradeContext } from "../contexts/GradeContext";
 import { useApp } from "../contexts/AppContext";
 import { useAuth } from "../contexts/AuthContext";
 import Modal from "./Modal";
-import { 
-  User, Building2, CalendarDays, Book, UserCog, Image, Phone, MapPin, GraduationCap, Edit, Trash2, ChevronLeft, ChevronRight, Send 
+import {
+  User,
+  Building2,
+  CalendarDays,
+  Book,
+  UserCog,
+  Image,
+  Phone,
+  MapPin,
+  GraduationCap,
+  Edit,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Send,
 } from "lucide-react";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useEnrollments } from "../contexts/EnrollmentContext";
-import { getStudentImageUrl, DEFAULT_STUDENT_IMAGE, GENDER_OPTIONS, COURSES, YEAR_LEVELS } from "../utils/constants";
+import {
+  getStudentImageUrl,
+  DEFAULT_STUDENT_IMAGE,
+  GENDER_OPTIONS,
+  COURSES,
+  YEAR_LEVELS,
+} from "../utils/constants";
 
 // Setup localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
 export const StudentDashboard = ({ loggedInStudentId }) => {
-  const { students, fetchStudents, enrollSubject, unenrollSubject, updateStudent } = useStudents();
+  const {
+    students,
+    fetchStudents,
+    enrollSubject,
+    unenrollSubject,
+    updateStudent,
+  } = useStudents();
   const { enrollments, fetchEnrollments } = useEnrollments();
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
@@ -46,7 +71,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
       if (!saved) return [];
       const parsed = JSON.parse(saved);
       if (!Array.isArray(parsed)) return [];
-      return parsed.map(ev => ({
+      return parsed.map((ev) => ({
         ...ev,
         start: ev.start ? new Date(ev.start) : new Date(),
         end: ev.end ? new Date(ev.end) : new Date(),
@@ -213,7 +238,9 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
           disabled={!subjects.length}
         >
           <option value="">
-            {subjects.length ? "Select a subject to enroll" : "Loading subjects..."}
+            {subjects.length
+              ? "Select a subject to enroll"
+              : "Loading subjects..."}
           </option>
           {subjects
             .filter((s) => !enrollments.includes(s.value))
@@ -260,7 +287,8 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             </p>
             <p className="flex items-center mb-2">
               <CalendarDays className="mr-2 text-gray-500" size={16} />
-              <strong>Year & Section:</strong> {`${currentStudent.year_level} - ${currentStudent.section}`}
+              <strong>Year & Section:</strong>{" "}
+              {`${currentStudent.year_level} - ${currentStudent.section}`}
             </p>
             <p className="flex items-center mb-2">
               <Book className="mr-2 text-gray-500" size={16} />
@@ -276,7 +304,8 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             </p>
             <p className="flex items-center mb-2">
               <Phone className="mr-2 text-gray-500" size={16} />
-              <strong>Contact Number:</strong> {currentStudent.contact_number || "N/A"}
+              <strong>Contact Number:</strong>{" "}
+              {currentStudent.contact_number || "N/A"}
             </p>
             <p className="flex items-center mb-2">
               <MapPin className="mr-2 text-gray-500" size={16} />
@@ -363,10 +392,19 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               ) : (
                 enrollments.map((enrollment) => {
                   // Use enrollment.subject or enrollment.subject_details
-                  const subj = subjects.find((s) => s.value === enrollment.subject);
+                  const subj = subjects.find(
+                    (s) => s.value === enrollment.subject
+                  );
                   return (
-                    <li key={enrollment.id} className="flex justify-between items-center border p-2 rounded">
-                      <span>{subj?.label || enrollment.subject_details?.name || enrollment.subject}</span>
+                    <li
+                      key={enrollment.id}
+                      className="flex justify-between items-center border p-2 rounded"
+                    >
+                      <span>
+                        {subj?.label ||
+                          enrollment.subject_details?.name ||
+                          enrollment.subject}
+                      </span>
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
@@ -723,7 +761,8 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             <div className="flex items-center space-x-4">
               <img
                 src={
-                  editForm.image_preview || getStudentImageUrl(currentStudent.image_url)
+                  editForm.image_preview ||
+                  getStudentImageUrl(currentStudent.image_url)
                 }
                 alt="Profile Preview"
                 className="w-24 h-24 rounded-full object-cover border-4 border-[#204032]"
@@ -773,11 +812,17 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               {enrollments.length === 0 ? (
                 <li className="text-gray-500 text-sm">No enrolled subjects.</li>
               ) : (
-                enrollments.map((code) => {
-                  const subj = subjects.find((s) => s.value === code);
+                enrollments.map((enrollment) => {
+                  const subj = subjects.find(
+                    (s) => s.value === enrollment.subject
+                  );
                   return (
-                    <li key={code} className="flex items-center gap-2">
-                      <span>{subj?.label || code}</span>
+                    <li key={enrollment.id} className="flex items-center gap-2">
+                      <span>
+                        {subj?.label ||
+                          enrollment.subject_details?.name ||
+                          enrollment.subject}
+                      </span>
                     </li>
                   );
                 })
