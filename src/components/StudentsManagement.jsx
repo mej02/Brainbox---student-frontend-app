@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useStudents } from "../contexts/StudentContext";
 import { useApp } from "../contexts/AppContext";
+import { useAuth } from "../contexts/AuthContext";
 import Modal from "./Modal";
 import ConfirmationModal from "./ConfirmationModal";
 import {
@@ -25,6 +26,7 @@ const StudentsManagement = () => {
   const { students, fetchStudents, addStudent, updateStudent, deleteStudent } =
     useStudents();
   const { loading } = useApp();
+  const { token } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentFormData, setStudentFormData] = useState({
     student_id: "",
@@ -54,8 +56,8 @@ const StudentsManagement = () => {
   });
 
   useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    fetchStudents(token);
+  }, [fetchStudents, token]);
 
   // Reset form and image preview when modal closes
   useEffect(() => {
@@ -232,7 +234,7 @@ const StudentsManagement = () => {
         if (key === "current_image_url") return;
         formData.append(key, value);
       });
-      success = await updateStudent(editingStudent.student_id, formData, true);
+      success = await updateStudent(editingStudent.student_id, formData, token);
     } else {
       // Add
       const formData = new FormData();
@@ -240,7 +242,7 @@ const StudentsManagement = () => {
         if (key === "current_image_url") return;
         formData.append(key, value);
       });
-      success = await addStudent(formData);
+      success = await addStudent(formData, token);
     }
     if (success) {
       setIsModalOpen(false);
@@ -256,7 +258,7 @@ const StudentsManagement = () => {
   // Confirms and executes student deletion
   const handleConfirmDelete = async () => {
     if (studentToDelete) {
-      await deleteStudent(studentToDelete.student_id);
+      await deleteStudent(studentToDelete.student_id, token);
       setIsConfirmModalOpen(false);
       setStudentToDelete(null);
     }

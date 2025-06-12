@@ -255,7 +255,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             await addEnrollment({
               student: currentStudentId, // <-- add this line
               subject: selectedSubjectCode,
-            });
+            }, token); // <-- pass token here
             setSelectedSubjectCode("");
             await fetchEnrollments(token);
           }}
