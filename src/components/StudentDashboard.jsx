@@ -60,6 +60,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
     address: "",
   });
 
+  // Calendar event state and handlers
   const [events, setEvents] = useState(() => {
     try {
       const saved = localStorage.getItem("studentEvents");
@@ -76,7 +77,6 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
       return [];
     }
   });
-
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [newEventTitle, setNewEventTitle] = useState("");
@@ -99,6 +99,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
     if (currentStudentId) fetchEnrollments(token);
   }, [currentStudentId, fetchEnrollments, token]);
 
+  // Save events to localStorage on change
   useEffect(() => {
     if (Array.isArray(events)) {
       localStorage.setItem("studentEvents", JSON.stringify(events));
