@@ -241,29 +241,9 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               : "Loading subjects..."}
           </option>
           {subjects
-            .filter((s) => {
-              // Try to match both string and object cases
-              return !enrollments.some((enrollment) => {
-                if (typeof enrollment.subject === "object" && enrollment.subject !== null) {
-                  return (
-                    enrollment.subject.value === s.value ||
-                    enrollment.subject.id === s.value ||
-                    enrollment.subject === s.value
-                  );
-                }
-                // Also check subject_details if present
-                if (enrollment.subject_details && enrollment.subject_details.code) {
-                  return enrollment.subject_details.code === s.value;
-                }
-                return (
-                  enrollment.subject === s.value ||
-                  enrollment.subject === s.id
-                );
-              });
-            })
             .map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
+              <option key={s.code} value={s.code}>
+                {s.name}
               </option>
             ))}
         </select>
@@ -411,7 +391,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                 enrollments.map((enrollment) => {
                   // Use enrollment.subject or enrollment.subject_details
                   const subj = subjects.find(
-                    (s) => s.value === enrollment.subject
+                    (s) => s.code === enrollment.subject
                   );
                   return (
                     <li
@@ -419,7 +399,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                       className="flex justify-between items-center border p-2 rounded"
                     >
                       <span>
-                        {subj?.label ||
+                        {subj?.name ||
                           enrollment.subject_details?.name ||
                           enrollment.subject}
                       </span>
@@ -436,7 +416,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                     </li>
                   );
                 })
-              }
+              )}
             </ul>
           </div>
         </div>
