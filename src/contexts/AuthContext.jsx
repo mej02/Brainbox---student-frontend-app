@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [userRole, setUserRole] = useState(null);
   const [loggedInStudentId, setLoggedInStudentId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem("access_token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
 
   const login = async (username, password, role) => {
     setLoading(true);

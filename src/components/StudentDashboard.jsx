@@ -37,13 +37,8 @@ import {
 const localizer = momentLocalizer(moment);
 
 export const StudentDashboard = ({ loggedInStudentId }) => {
-  const {
-    students,
-    fetchStudents,
-    enrollSubject,
-    updateStudent,
-  } = useStudents();
   const { enrollments, fetchEnrollments, unenrollSubject } = useEnrollments();
+  const { students, fetchStudents, enrollSubject, updateStudent } = useStudents();
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
   useApp();
