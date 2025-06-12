@@ -41,10 +41,9 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
     students,
     fetchStudents,
     enrollSubject,
-    unenrollSubject,
     updateStudent,
   } = useStudents();
-  const { enrollments, fetchEnrollments } = useEnrollments();
+  const { enrollments, fetchEnrollments, unenrollSubject } = useEnrollments();
   const { subjects, fetchSubjects } = useSubjects();
   const { grades, fetchGrades } = useGradeContext();
   useApp();
@@ -808,6 +807,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
           </div>
 
           {/* Show enrolled subjects in Edit Profile modal */}
+          {/* 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Enrolled Subjects
@@ -833,6 +833,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               )}
             </ul>
           </div>
+          */}
 
           <div className="flex justify-end space-x-3 mt-6">
             <button
