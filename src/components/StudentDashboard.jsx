@@ -406,7 +406,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
-                        onClick={() => deleteEnrollment(enrollment.id)}
+                        onClick={() => deleteEnrollment(enrollment.id, token)}
                       >
                         Unenroll
                       </button>
@@ -581,11 +581,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               }
             });
             formData.append("student_id", currentStudent.student_id);
-            const success = await updateStudent(
-              currentStudent.student_id,
-              formData,
-              true
-            );
+            const success = await updateStudent(currentStudent.student_id, formData, true);
             if (success) setIsEditModalOpen(false);
           }}
           className="space-y-4"

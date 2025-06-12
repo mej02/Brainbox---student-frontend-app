@@ -119,16 +119,17 @@ export const EnrollmentProvider = ({ children }) => {
     }
   };
 
-  const deleteEnrollment = async (id) => {
+  const deleteEnrollment = async (id, tokenArg) => {
     try {
       const csrfToken = getCookie("csrftoken");
-      if (!token) throw new Error("No auth token");
+      const authToken = tokenArg || token;
+      if (!authToken) throw new Error("No auth token");
       const response = await fetch(`${API_URL}${id}/`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "X-CSRFToken": csrfToken,
-          "Authorization": `Bearer ${token}`,
+          "Authorization": `Bearer ${authToken}`,
         },
       });
       if (response.status === 401) {
