@@ -1,23 +1,31 @@
-# Brainbox---student-frontend-app (Frontend)
+Frontend (React)
+Deployed Backend:
+https://brainbox-student-management-system.onrender.com
+
+Deployed Frontend:
+https://brainbox-student-management-system.vercel.app
+
+
+---
+
+### Frontend (`student-frontend-app/README.md`)
+
+```markdown
+# Brainbox Student Management System (Frontend)
 
 This is the React frontend for the Brainbox Student Management System.
 
-## Setup
+## How to Run (for Professors/Reviewers)
 
-1. Clone the repository:
-2. Git clone https://github.com/mej02/Brainbox---student-frontend-app.git cd Brainbox---student-frontend-app
-3. Install dependencies: npm install
-4. Start the development server: npm run dev
-5. The frontend will be available at `http://localhost:5173/`
+1. **Clone the repository:**
 
-## Connecting to the Backend
+   ```sh
+   git clone https://github.com/mej02/Brainbox---student-frontend-app.git
+   cd Brainbox---student-frontend-app
 
-- the frontend expects the backend API at `http://localhost:8000/`.
-- if your backend runs elsewhere, update the API URL in your frontend configuration (e.g., `.env` or directly in your code).
+2. npm install
+3. npm run dev
 
-## Related Repositories
+4. Access the frontend:
+   http://localhost:5173/
 
-- [Backend (Django)](https://github.com/mej02/Brainbox---Student-Management-System)
-
-- Backend: https://github.com/mej02/Brainbox---Student-Management-System
-- Frontend: https://github.com/mej02/Brainbox---student-frontend-app
