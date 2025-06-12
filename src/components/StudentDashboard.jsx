@@ -254,6 +254,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
             if (!selectedSubjectCode) return;
             await enrollSubject(selectedSubjectCode);
             setSelectedSubjectCode("");
+            await fetchEnrollments(token); // <-- refresh after enrolling
           }}
         >
           Enroll
@@ -406,7 +407,10 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
                       <button
                         type="button"
                         className="text-red-600 hover:underline text-xs"
-                        onClick={() => deleteEnrollment(enrollment.id, token)}
+                        onClick={async () => {
+                          await deleteEnrollment(enrollment.id, token);
+                          await fetchEnrollments(token); // <-- refresh the enrollments list
+                        }}
                       >
                         Unenroll
                       </button>
@@ -581,7 +585,7 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
               }
             });
             formData.append("student_id", currentStudent.student_id);
-            const success = await updateStudent(currentStudent.student_id, formData, true);
+            const success = await updateStudent(currentStudent.student_id, formData, token); // <-- use token here
             if (success) setIsEditModalOpen(false);
           }}
           className="space-y-4"
