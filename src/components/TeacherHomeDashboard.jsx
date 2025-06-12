@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useStudents } from "../contexts/StudentContext";
 import { useSubjects } from "../contexts/SubjectContext";
 import { useGradeContext } from "../contexts/GradeContext";
 import { useAuth } from "../contexts/AuthContext";
 
 const TeacherHomeDashboard = () => {
-  const { students } = useStudents();
-  const { subjects } = useSubjects();
-  const { grades } = useGradeContext();
-  const { userRole } = useAuth();
+  const { students, fetchStudents } = useStudents();
+  const { subjects, fetchSubjects } = useSubjects();
+  const { grades, fetchGrades } = useGradeContext();
+  const { userRole, token } = useAuth();
+
+  // Fetch all data on mount
+  useEffect(() => {
+    if (token) {
+      fetchStudents(token);
+      fetchSubjects(token);
+      fetchGrades(token);
+    }
+  }, [token, fetchStudents, fetchSubjects, fetchGrades]);
 
   // Get the most recent 5 grades (sorted by id descending)
   const recentGrades = [...grades].sort((a, b) => b.id - a.id).slice(0, 5);
