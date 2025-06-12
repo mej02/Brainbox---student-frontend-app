@@ -251,7 +251,10 @@ export const StudentDashboard = ({ loggedInStudentId }) => {
           className="bg-[#204032] text-white px-4 py-1 rounded hover:bg-[#183024] transition"
           onClick={async () => {
             if (!selectedSubjectCode) return;
-            await addEnrollment({ subject: selectedSubjectCode });
+            await addEnrollment({
+              student: currentStudentId, // <-- add this line
+              subject: selectedSubjectCode,
+            });
             setSelectedSubjectCode("");
             await fetchEnrollments(token);
           }}
